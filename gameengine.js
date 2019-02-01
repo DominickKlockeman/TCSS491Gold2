@@ -164,6 +164,16 @@ GameEngine.prototype.loop = function () {
     this.over = null;
 }
 
+GameEngine.prototype.reset = function () {
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].reset();
+        
+    }
+    //console.log(this.actualTime.gameTime);
+    // this.actualTime.gameTime = 0;
+    
+}
+
 function Entity(game, x, y) {
     this.game = game;
     this.x = x;
@@ -174,6 +184,8 @@ function Entity(game, x, y) {
 Entity.prototype.update = function () {
 }
 
+Entity.prototype.reset = function () {
+}
 Entity.prototype.draw = function (ctx) {
     if (this.game.showOutlines && this.radius) {
         this.game.ctx.beginPath();
