@@ -74,12 +74,28 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
+
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+
+        if (x < 1024) {
+            x = Math.floor(x / 32);
+            y = Math.floor(y / 32);
+        }
+
+        return { x: x, y: y };
+    }
+
     var that = this;
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') that.space = true;
-//        console.log(e);
         e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.click = getXandY(e);
     }, false);
 
     console.log('Input started');
@@ -151,7 +167,7 @@ Entity.prototype.update = function () {
 }
 
 Entity.prototype.reset = function () {
-    
+
 }
 
 Entity.prototype.draw = function (ctx) {
