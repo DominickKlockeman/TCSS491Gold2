@@ -259,7 +259,7 @@ Character.prototype.reset = function() {
 /******************************************************************************************/
 
 function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
     // this.radius = 100;
     this.ground = 350;
