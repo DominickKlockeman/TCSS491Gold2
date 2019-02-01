@@ -138,9 +138,9 @@ PlayGame.prototype.reset = function () {
 
 }
 PlayGame.prototype.update = function () {
-    if (this.game.click && this.game.unicorn.lives > 0) {
+    //if (this.game.cube.) {
         this.game.running = true;
-    } 
+   // } 
 }
 
 PlayGame.prototype.draw = function (ctx) {
