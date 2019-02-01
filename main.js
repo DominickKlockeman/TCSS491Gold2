@@ -155,7 +155,7 @@ PlayGame.prototype.reset = function () {
 PlayGame.prototype.update = function () {
     if (this.game.alive) {
         this.game.running = true;
-    } 
+    }
 }
 
 PlayGame.prototype.draw = function (ctx) {
