@@ -12,6 +12,10 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.reverse = reverse;
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
     var scaleBy = scaleBy || 1;
     this.elapsedTime += tick;
@@ -52,6 +56,10 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 // no inheritance
 function Background(game, spritesheet) {
     this.x = -800;
@@ -73,6 +81,10 @@ Background.prototype.update = function () {
     if(this.x > 0) this.x = -800;
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 function Foreground(game, spritesheet) {
     this.x = 0;
     this.y = 0;
@@ -93,17 +105,10 @@ Foreground.prototype.update = function () {
     if(this.x < -800) this.x = 0;
 }
 
-function BoundingBox(x, y, width, height) {
-    this.x = x;
-    this.y = y;
-    this.width = width;
-    this.height = height;
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
 
-    this.left = x;
-    this.top = y;
-    this.right = this.left + width;
-    this.bottom = this.top + height;
-}
 function BoundingBox(x, y, width, height) {
     this.x = x;
     this.y = y;
@@ -122,6 +127,11 @@ BoundingBox.prototype.collide = function (oth) {
 
     return false;
 }
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 function PlayGame(game, x, y) {
     Entity.call(this, game, x, y);
 }
@@ -146,6 +156,11 @@ PlayGame.prototype.draw = function (ctx) {
         ctx.fillText("Game Over Man!", this.x-30, this.y);
     }
 }
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 function Cube(game) {
 
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
@@ -222,6 +237,10 @@ Cube.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 function Block(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
@@ -251,6 +270,10 @@ Block.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 function Spike(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
@@ -275,7 +298,9 @@ Spike.prototype.draw = function (ctx) {
 }
 
 
-
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
 
 // the "main" code begins here
 
