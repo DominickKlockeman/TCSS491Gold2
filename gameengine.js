@@ -28,6 +28,20 @@ Timer.prototype.tick = function () {
     return gameDelta;
 }
 
+function VisibleTimer(game) {
+    this.game = game;
+    Entity.call(this, game, 695, 100);
+}
+
+VisibleTimer.prototype = new Entity();
+VisibleTimer.prototype.constructor = VisibleTimer;
+
+VisibleTimer.prototype.draw = function(ctx) {
+    ctx.font = "24pt Impact";
+    ctx.fillStyle = "red";
+    ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+}
+
 function GameEngine() {
     this.entities = [];
     this.showOutlines = false;
@@ -45,6 +59,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceHeight = this.ctx.canvas.height;
     this.startInput();
     this.timer = new Timer();
+    this.actualTime = new Timer();
     console.log('game initialized');
 }
 
@@ -92,6 +107,11 @@ GameEngine.prototype.update = function () {
 
         if (!entity.removeFromWorld) {
             entity.update();
+            if (entity instanceof PlayGame) {
+                if (entity.game.running != null && entity.game.running) {
+                    this.actualTime.tick();
+                }
+            }
         }
     }
 
