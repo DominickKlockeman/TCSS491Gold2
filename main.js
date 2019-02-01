@@ -153,7 +153,7 @@ PlayGame.prototype.reset = function () {
 
 }
 PlayGame.prototype.update = function () {
-    if (this.game.alive) {
+    if (this.game.click && this.game.alive) {
         this.game.running = true;
     }
 }
@@ -162,7 +162,11 @@ PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
         ctx.font = "30pt Impact";
         ctx.fillStyle = "red";
-        ctx.fillText("Game Over", 325, 250);
+        if(!this.game.character.dead) {
+            ctx.fillText("Enter the adeventure through space...", 100, 250);
+        } else {
+            ctx.fillText("Game Over", 325, 250);
+        }
     }
 }
 
@@ -241,7 +245,7 @@ Character.prototype.draw = function (ctx) {
     else {
         ctx.lineWidth = 10;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+        //ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
@@ -260,7 +264,7 @@ function Block(game) {
     // this.radius = 100;
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
-    Entity.call(this, game, 300, 350);
+    Entity.call(this, game, 800, 350);
 }
 
 Block.prototype = new Entity();
@@ -285,7 +289,7 @@ Block.prototype.draw = function (ctx) {
     
         ctx.lineWidth = 10;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+        //ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
         this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 5, this.y, 3);
     }
    
@@ -352,7 +356,10 @@ ASSET_MANAGER.downloadAll(function () {
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
     gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
-    gameEngine.addEntity(new Character(gameEngine));
+    var character = new Character(gameEngine);
+    gameEngine.addEntity(character);
+    gameEngine.character = character;
+
     let block = new Block(gameEngine);
     gameEngine.addEntity(block);
     gameEngine.block = block;
