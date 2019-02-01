@@ -74,40 +74,11 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
-
-    var getXandY = function (e) {
-        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
-        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
-
-        if (x < 1024) {
-            x = Math.floor(x / 32);
-            y = Math.floor(y / 32);
-        }
-
-        return { x: x, y: y };
-    }
-
     var that = this;
-
-    this.ctx.canvas.addEventListener("click", function (e) {
-        that.click = getXandY(e);
-    }, false);
-
-    this.ctx.canvas.addEventListener("mousemove", function (e) {
-        that.mouse = getXandY(e);
-    }, false);
-
-    this.ctx.canvas.addEventListener("mouseleave", function (e) {
-        that.mouse = null;
-    }, false);
-
-    this.ctx.canvas.addEventListener("mousewheel", function (e) {
-        that.wheel = e;
-        e.preventDefault();
-    }, false);
 
     this.ctx.canvas.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') that.space = true;
+//        console.log(e);
         e.preventDefault();
     }, false);
 
@@ -119,14 +90,11 @@ GameEngine.prototype.addEntity = function (entity) {
     this.entities.push(entity);
 }
 
-GameEngine.prototype.draw = function (drawCallback) {
+GameEngine.prototype.draw = function () {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.save();
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].draw(this.ctx);
-    }
-    if (drawCallback) {
-        drawCallback(this);
     }
     this.ctx.restore();
 }
@@ -169,9 +137,6 @@ GameEngine.prototype.loop = function () {
     this.update();
     this.draw();
     this.space = null;
-    this.click = null;
-    this.wheel = null;
-    this.over = null;
 }
 
 function Entity(game, x, y) {
