@@ -122,6 +122,16 @@ GameEngine.prototype.update = function () {
     }
 }
 
+GameEngine.prototype.reset = function () {
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].reset();
+
+    }
+    //console.log(this.actualTime.gameTime);
+    // this.actualTime.gameTime = 0;
+
+}
+
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
