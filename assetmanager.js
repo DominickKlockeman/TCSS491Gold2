@@ -11,11 +11,10 @@ AssetManager.prototype.queueDownload = function (path) {
 }
 
 AssetManager.prototype.isDone = function () {
-    return (this.downloadQueue.length === this.successCount + this.errorCount);
+    return this.downloadQueue.length === this.successCount + this.errorCount;
 }
 
 AssetManager.prototype.downloadAll = function (callback) {
-    if (this.downloadQueue.length === 0) window.setTimeout(callback, 100);
     for (var i = 0; i < this.downloadQueue.length; i++) {
         var img = new Image();
         var that = this;
