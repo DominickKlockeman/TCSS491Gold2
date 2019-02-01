@@ -12,10 +12,6 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.reverse = reverse;
 }
 
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
-
 Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
     var scaleBy = scaleBy || 1;
     this.elapsedTime += tick;
@@ -71,9 +67,8 @@ function Background(game, spritesheet) {
     this.radius = 200;
 };
 
-Background.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
-    this.x, this.y);
+Background.prototype.draw = function (ctx) {
+    ctx.drawImage(this.spritesheet, this.x, this.y);
 };
 
 Background.prototype.update = function () {
@@ -99,9 +94,8 @@ function Foreground(game, spritesheet) {
     this.radius = 200;
 }
 
-Foreground.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
-    this.x, this.y);
+Foreground.prototype.draw = function (ctx) {
+    ctx.drawImage(this.spritesheet, this.x, this.y);
 };
 
 Foreground.prototype.update = function () {
@@ -254,7 +248,43 @@ Character.prototype.reset = function() {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Block(game) {
+function Block(game, x, y, width, height) {
+    this.width = width;
+    this.height = height;
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(x, y, width, height);
+    Entity.call(this, game, x, y);
+}
+
+Block.prototype = new Entity();
+Block.prototype.constructor = Block;
+
+Block.prototype.reset = function() {
+    this.x = this.startX;
+    this.y = this.startY
+}
+
+Block.prototype.update = function() {
+    if (!this.game.running) {
+        return;
+    }
+    this.x -=-400 * this.game.clockTick;
+    if(this.x + this.width < 0) {
+        this.x += 200;
+    }
+    this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
+    Entity.prototype.update.call(this);
+}
+
+Block.prototype.draw = function(ctx) {
+    if(!this.game.running){
+        return;
+    }
+    this.animation.drawFrame(this.game.clockTick, ctx, this,x, this,y, 1);
+}
+
+/*function Block(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
     // this.radius = 100;
@@ -291,6 +321,8 @@ Block.prototype.draw = function (ctx) {
    
     Entity.prototype.draw.call(this);
 }
+
+*/
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -340,14 +372,11 @@ ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
-    document.getElementById('gameWorld').focus();
     var ctx = canvas.getContext('2d');
+    document.getElementById('gameWorld').focus();
 
     var gameEngine = new GameEngine();
  
-    gameEngine.init(ctx);
-    gameEngine.start();
-    // gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/background_test2.png")));
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
@@ -357,8 +386,11 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(block);
     gameEngine.block = block;
     gameEngine.running = false;
+
     //gameEngine.addEntity(new Block(gameEngine));
     //gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
+    gameEngine.init(ctx);
+    gameEngine.start();
 });
