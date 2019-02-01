@@ -277,6 +277,9 @@ Block.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
+/**
+ * Testing
+ */
 Block.prototype.draw = function (ctx) {
     if (this.game.running) {
         if(this.x < -64) {
