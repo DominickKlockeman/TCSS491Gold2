@@ -177,6 +177,8 @@ GameEngine.prototype.loop = function () {
     this.update();
     this.draw();
     this.space = null;
+    this.click = null;
+    this.wheel = null;
 }
 
 function Entity(game, x, y) {
