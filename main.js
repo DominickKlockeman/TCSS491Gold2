@@ -12,8 +12,6 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.reverse = reverse;
 }
 
-/** */
-/******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -58,12 +56,14 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
 // no inheritance
 function Background(game, spritesheet) {
+
     this.x = -800;
     this.y = 1;
     this.spritesheet = spritesheet;
@@ -71,6 +71,8 @@ function Background(game, spritesheet) {
     this.ctx = game.ctx;
     // Entity.call(this, game, 0, 400);
     this.radius = 200;
+
+    
 };
 
 Background.prototype.draw = function () {
@@ -83,11 +85,16 @@ Background.prototype.update = function () {
     if(this.x > 0) this.x = -800;
 }
 
+Background.prototype.reset = function () {
+
+}
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
 function Foreground(game, spritesheet) {
+
     this.x = 0;
     this.y = 0;
     this.spritesheet = spritesheet;
@@ -105,6 +112,10 @@ Foreground.prototype.draw = function () {
 Foreground.prototype.update = function () {
     this.x -= 1;
     if(this.x < -800) this.x = 0;
+}
+
+Foreground.prototype.reset = function() {
+
 }
 
 /******************************************************************************************/
@@ -135,7 +146,10 @@ BoundingBox.prototype.collide = function (oth) {
 /******************************************************************************************/
 
 function PlayGame(game, x, y) {
+
     Entity.call(this, game, x, y);
+    var audio = new Audio('./sound/test.mp3');
+    audio.play();
 }
 
 PlayGame.prototype = new Entity();
@@ -143,19 +157,24 @@ PlayGame.prototype.constructor = PlayGame;
 
 PlayGame.prototype.reset = function () {
     this.game.running = false;
+    //console.log(this.game.running);
 
 }
 PlayGame.prototype.update = function () {
-    //if (this.game.cube.) {
+    if (this.game.click && this.game.alive) {
         this.game.running = true;
-   // } 
+    }
 }
 
 PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
-        ctx.font = "24pt Impact";
+        ctx.font = "30pt Impact";
         ctx.fillStyle = "red";
-        ctx.fillText("Game Over Man!", this.x-30, this.y);
+        if(!this.game.character.dead) {
+            ctx.fillText("Enter the adeventure through space...", 100, 250);
+        } else {
+            ctx.fillText("Game Over", 325, 250);
+        }
     }
 }
 
@@ -163,7 +182,7 @@ PlayGame.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Cube(game) {
+function Character(game) {
 
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
     this.animation = cubeSlideBeginning;
@@ -171,29 +190,33 @@ function Cube(game) {
     this.jumping = false;
     this.dead = false;
     this.block = game.block;
-
+    game.alive = !this.dead;
     // this.radius = 100;
     this.ground = 350;
+
 
     this.boundingbox = new BoundingBox(this.x + 65, this.y, this.animation.frameWidth - 0.10, this.animation.frameHeight - 15);
     Entity.call(this, game, 0, 350);
 }
 
-Cube.prototype = new Entity();
-Cube.prototype.constructor = Cube;
+Character.prototype = new Entity();
+Character.prototype.constructor = Character;
 
-Cube.prototype.update = function () {
+Character.prototype.update = function () {
+    
     if (this.game.running) {
         if (this.dead) {
             this.game.reset();
+            this.game.alive = false;
             return;
         }
         if (this.game.space) this.jumping = true;
         if (this.jumping) {
+           
             if (this.jumpAnimation.isDone()) {
                 this.jumpAnimation.elapsedTime = 0;
                 this.jumping = false;
-                Cube.animation = cubeSlideBeginning;
+                Character.animation = cubeSlideBeginning;
             }
             var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;
             var totalHeight = 200;
@@ -219,13 +242,13 @@ Cube.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-Cube.prototype.draw = function (ctx) {
+Character.prototype.draw = function (ctx) {
     if(this.dead){
         return;
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 1;
-        ctx.font = "50px Georgia";
-        ctx.strokeText("YOU DIED!", 250, 250);
+        // ctx.strokeStyle = "red";
+        // ctx.lineWidth = 1;
+        // ctx.font = "50px Georgia";
+        // ctx.strokeText("YOU DIED!", 250, 250);
     }
     if (this.jumping) {
         this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
@@ -233,10 +256,13 @@ Cube.prototype.draw = function (ctx) {
     else {
         ctx.lineWidth = 10;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+        //ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
+}
+Character.prototype.reset = function() {
+
 }
 
 /******************************************************************************************/
@@ -244,31 +270,40 @@ Cube.prototype.draw = function (ctx) {
 /******************************************************************************************/
 
 function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
     // this.radius = 100;
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
-    Entity.call(this, game, 300, 350);
+    Entity.call(this, game, 800, 350);
 }
 
 Block.prototype = new Entity();
 Block.prototype.constructor = Block;
 
+Block.prototype.reset = function() {
+
+}
 Block.prototype.update = function () {
-    this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
+    if (this.game.running) {
+        this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
+    }
+    
     Entity.prototype.update.call(this);
 }
 
 Block.prototype.draw = function (ctx) {
-    if(this.x < -64) {
-        this.x = 800; 
+    if (this.game.running) {
+        if(this.x < -64) {
+            this.x = 800; 
+        }
+    
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = "blue";
+        //ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 5, this.y, 3);
     }
-
-    ctx.lineWidth = 10;
-    ctx.strokeStyle = "blue";
-    ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
-    this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 5, this.y, 3);
+   
     Entity.prototype.draw.call(this);
 }
 
@@ -327,17 +362,24 @@ ASSET_MANAGER.downloadAll(function () {
  
     gameEngine.init(ctx);
     gameEngine.start();
+
     // gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/background_test2.png")));
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
     gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
-    gameEngine.addEntity(new Cube(gameEngine));
+    var character = new Character(gameEngine);
+    gameEngine.addEntity(character);
+    gameEngine.character = character;
+
     let block = new Block(gameEngine);
     gameEngine.addEntity(block);
     gameEngine.block = block;
+    gameEngine.running = false;
+
     //gameEngine.addEntity(new Block(gameEngine));
     //gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
 });
+
