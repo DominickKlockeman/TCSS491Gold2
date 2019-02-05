@@ -179,6 +179,7 @@ PlayGame.prototype.draw = function (ctx) {
             
         } else {
             ctx.fillText("Enter the adeventure through space...", 100, 250);
+
         }
     }
 }
