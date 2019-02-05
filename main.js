@@ -12,6 +12,10 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.reverse = reverse;
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
     var scaleBy = scaleBy || 1;
     this.elapsedTime += tick;
@@ -67,8 +71,9 @@ function Background(game, spritesheet) {
     this.radius = 200;
 };
 
-Background.prototype.draw = function (ctx) {
-    ctx.drawImage(this.spritesheet, this.x, this.y);
+Background.prototype.draw = function () {
+    this.ctx.drawImage(this.spritesheet,
+    this.x, this.y);
 };
 
 Background.prototype.update = function () {
@@ -94,8 +99,9 @@ function Foreground(game, spritesheet) {
     this.radius = 200;
 }
 
-Foreground.prototype.draw = function (ctx) {
-    ctx.drawImage(this.spritesheet, this.x, this.y);
+Foreground.prototype.draw = function () {
+    this.ctx.drawImage(this.spritesheet,
+    this.x, this.y);
 };
 
 Foreground.prototype.update = function () {
@@ -143,20 +149,37 @@ PlayGame.prototype.constructor = PlayGame;
 
 PlayGame.prototype.reset = function () {
     this.game.running = false;
-    //console.log(this.game.running);
-
 }
 PlayGame.prototype.update = function () {
-    if (this.game.alive) {
+    if (this.game.click && this.game.alive) {
         this.game.running = true;
-    } 
+    }
 }
 
 PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
         ctx.font = "30pt Impact";
         ctx.fillStyle = "red";
-        ctx.fillText("Game Over", 325, 250);
+        
+        if(!this.game.alive) {
+            ctx.fillText("Game Over", 325, 250);
+            ctx.fillText("Replay?", 346, 300);
+            if (this.game.click != null && this.game.click.x >= 346 &&
+                this.game.click.x <= 480 && this.game.click.y >= 265 &&
+                this.game.click.y <= 300) {
+                    this.game.running = true;
+                    this.game.actualTime.gameTime = 0;
+            }
+            if (this.game.mouse != null && this.game.mouse.x >= 346 && this.game.mouse.x <= 480 && 
+                this.game.mouse.y >= 265 && this.game.mouse.y <= 300) {
+                ctx.fillStyle = "white";
+                ctx.fillText("Replay?", 346, 300);
+                
+            }
+            
+        } else {
+            ctx.fillText("Enter the adeventure through space...", 100, 250);
+        }
     }
 }
 
@@ -175,9 +198,8 @@ function Character(game) {
     game.alive = !this.dead;
     // this.radius = 100;
     this.ground = 350;
-
     this.boundingbox = new BoundingBox(this.x + 65, this.y, this.animation.frameWidth - 0.10, this.animation.frameHeight - 15);
-    Entity.call(this, game, 0, 350);
+    Entity.call(this, game, -64, 350);
 }
 
 Character.prototype = new Entity();
@@ -186,8 +208,8 @@ Character.prototype.constructor = Character;
 Character.prototype.update = function () {
     if (this.game.running) {
         if (this.dead) {
-            this.game.reset();
             this.game.alive = false;
+            this.game.reset();
             return;
         }
         if (this.game.space) this.jumping = true;
@@ -222,82 +244,50 @@ Character.prototype.update = function () {
 }
 
 Character.prototype.draw = function (ctx) {
-    if(this.dead){
-        return;
-        // ctx.strokeStyle = "red";
-        // ctx.lineWidth = 1;
-        // ctx.font = "50px Georgia";
-        // ctx.strokeText("YOU DIED!", 250, 250);
+    if (this.game.running) {
+        if(this.dead){
+            return;
+        }
+        if (this.jumping) {
+            this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        }
+        else {
+            ctx.lineWidth = 10;
+            ctx.strokeStyle = "blue";
+            //ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+            if (this.x < 0) {
+                this.x += 1;
+            }
+            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        }
     }
-    if (this.jumping) {
-        this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-    }
-    else {
-        ctx.lineWidth = 10;
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-    }
+
     Entity.prototype.draw.call(this);
 }
 Character.prototype.reset = function() {
-
+    this.dead = false;
+    this.x = -64;
 }
 
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Block(game, x, y, width, height) {
-    this.width = width;
-    this.height = height;
-    this.startX = x;
-    this.startY = y;
-    this.boundingbox = new BoundingBox(x, y, width, height);
-    Entity.call(this, game, x, y);
-}
-
-Block.prototype = new Entity();
-Block.prototype.constructor = Block;
-
-Block.prototype.reset = function() {
-    this.x = this.startX;
-    this.y = this.startY
-}
-
-Block.prototype.update = function() {
-    if (!this.game.running) {
-        return;
-    }
-    this.x -=-400 * this.game.clockTick;
-    if(this.x + this.width < 0) {
-        this.x += 200;
-    }
-    this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
-    Entity.prototype.update.call(this);
-}
-
-Block.prototype.draw = function(ctx) {
-    if(!this.game.running){
-        return;
-    }
-    this.animation.drawFrame(this.game.clockTick, ctx, this,x, this,y, 1);
-}
-
-/*function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+function Block(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
     // this.radius = 100;
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
-    Entity.call(this, game, 300, 350);
+    Entity.call(this, game, 800, 350);
 }
 
 Block.prototype = new Entity();
 Block.prototype.constructor = Block;
 
 Block.prototype.reset = function() {
-
+    this.x = 800;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
 }
 Block.prototype.update = function () {
     if (this.game.running) {
@@ -307,9 +297,6 @@ Block.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-/**
- * Testing
- */
 Block.prototype.draw = function (ctx) {
     if (this.game.running) {
         if(this.x < -64) {
@@ -318,14 +305,12 @@ Block.prototype.draw = function (ctx) {
     
         ctx.lineWidth = 10;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
+        //ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
         this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 5, this.y, 3);
     }
    
     Entity.prototype.draw.call(this);
 }
-
-*/
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -367,7 +352,6 @@ ASSET_MANAGER.queueDownload("./img/cube_slide.png");
 ASSET_MANAGER.queueDownload("./img/cube_jump.png");
 ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
-// ASSET_MANAGER.queueDownload("./img/background_test2.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
 
@@ -375,16 +359,21 @@ ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
-    var ctx = canvas.getContext('2d');
     document.getElementById('gameWorld').focus();
+    var ctx = canvas.getContext('2d');
 
     var gameEngine = new GameEngine();
  
+    gameEngine.init(ctx);
+    gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
     gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
-    gameEngine.addEntity(new Character(gameEngine));
+    var character = new Character(gameEngine);
+    gameEngine.addEntity(character);
+    gameEngine.character = character;
+
     let block = new Block(gameEngine);
     gameEngine.addEntity(block);
     gameEngine.block = block;
@@ -394,6 +383,5 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
-    gameEngine.init(ctx);
-    gameEngine.start();
 });
+

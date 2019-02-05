@@ -30,6 +30,7 @@ Timer.prototype.tick = function () {
 
 function VisibleTimer(game) {
     this.game = game;
+    this.runTime = null;
     Entity.call(this, game, 695, 100);
 }
 
@@ -37,9 +38,19 @@ VisibleTimer.prototype = new Entity();
 VisibleTimer.prototype.constructor = VisibleTimer;
 
 VisibleTimer.prototype.draw = function(ctx) {
-    ctx.font = "24pt Impact";
-    ctx.fillStyle = "red";
-    ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+    if (this.game.running) {
+        ctx.font = "24pt Impact";
+        ctx.fillStyle = "red";
+        ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+        this.runTime = this.game.actualTime.gameTime.toFixed(3);
+    } else {
+        if (this.runTime != null) {
+            ctx.font = "24pt Impact";
+            ctx.fillStyle = "red";
+            ctx.fillText(this.runTime, 695, 100);
+        }
+    }
+    
 }
 
 function GameEngine() {
@@ -79,10 +90,10 @@ GameEngine.prototype.startInput = function () {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
 
-        if (x < 1024) {
-            x = Math.floor(x / 32);
-            y = Math.floor(y / 32);
-        }
+        // if (x < 1024) {
+        //     x = Math.floor(x / 32);
+        //     y = Math.floor(y / 32);
+        // }
 
         return { x: x, y: y };
     }
@@ -91,6 +102,7 @@ GameEngine.prototype.startInput = function () {
 
     this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
+        console.log(that.click.x + " " + that.click.y);
     }, false);
 
     this.ctx.canvas.addEventListener("mousemove", function (e) {
