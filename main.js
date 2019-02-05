@@ -196,10 +196,13 @@ function Character(game) {
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
+    this.explodeAnimation = new Animation(ASSET_MANAGER.getAsset("./img/explode.png"), 0, 0, 62, 62, 0.08, 5, false, false);
+    this.explode = false;
     this.jumping = false;
     this.dead = false;
     this.block = game.block;
     game.alive = !this.dead;
+    game.alive = !this.explode;
     // this.radius = 100;
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 65, this.y, this.animation.frameWidth - 0.10, this.animation.frameHeight - 15);
@@ -239,8 +242,11 @@ Character.prototype.update = function () {
             // console.log("Cube" + this.boundingbox.x);
             // console.log("Block" + this.block.boundingbox);
             // console.log("");
+           
             this.boundingbox = new BoundingBox(this.x + 65, this.y + 10, this.animation.frameWidth -40, this.animation.frameHeight - 20);
-            if(this.boundingbox.collide(this.game.block.boundingbox)) this.dead = true;
+            if(this.boundingbox.collide(this.game.block.boundingbox)) 
+
+            this.explode = true;
         
         }
     }
@@ -249,7 +255,17 @@ Character.prototype.update = function () {
 
 Character.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if(this.dead){
+        if(this.explode){
+
+            this.explodeAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+
+            if(this.explodeAnimation.isDone()){
+
+                this.explode = false;
+                this.dead = true;
+
+            }
+
             return;
         }
         if (this.jumping) {
@@ -368,6 +384,7 @@ ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
+ASSET_MANAGER.queueDownload("./img/explode.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
