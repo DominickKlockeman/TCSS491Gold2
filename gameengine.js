@@ -28,6 +28,31 @@ Timer.prototype.tick = function () {
     return gameDelta;
 }
 
+function VisibleTimer(game) {
+    this.game = game;
+    this.runTime = null;
+    Entity.call(this, game, 695, 100);
+}
+
+VisibleTimer.prototype = new Entity();
+VisibleTimer.prototype.constructor = VisibleTimer;
+
+VisibleTimer.prototype.draw = function(ctx) {
+    if (this.game.running) {
+        ctx.font = "24pt Impact";
+        ctx.fillStyle = "red";
+        ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+        this.runTime = this.game.actualTime.gameTime.toFixed(3);
+    } else {
+        if (this.runTime != null) {
+            ctx.font = "24pt Impact";
+            ctx.fillStyle = "red";
+            ctx.fillText(this.runTime, 695, 100);
+        }
+    }
+    
+}
+
 function GameEngine() {
     this.entities = [];
     this.showOutlines = false;
@@ -45,6 +70,7 @@ GameEngine.prototype.init = function (ctx) {
     this.surfaceHeight = this.ctx.canvas.height;
     this.startInput();
     this.timer = new Timer();
+    this.actualTime = new Timer();
     console.log('game initialized');
 }
 
@@ -59,11 +85,40 @@ GameEngine.prototype.start = function () {
 
 GameEngine.prototype.startInput = function () {
     console.log('Starting input');
+
+    var getXandY = function (e) {
+        var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
+        var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
+
+        // if (x < 1024) {
+        //     x = Math.floor(x / 32);
+        //     y = Math.floor(y / 32);
+        // }
+
+        return { x: x, y: y };
+    }
+
     var that = this;
 
+    this.ctx.canvas.addEventListener("click", function (e) {
+        that.click = getXandY(e);
+        console.log(that.click.x + " " + that.click.y);
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);
+    }, false);
+
+    this.ctx.canvas.addEventListener("mouseleave", function (e) {
+        that.mouse = null;
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousewheel", function (e) {
+        that.wheel = e;
+        e.preventDefault();
+    }, false);
     this.ctx.canvas.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') that.space = true;
-//        console.log(e);
         e.preventDefault();
     }, false);
 
@@ -92,6 +147,11 @@ GameEngine.prototype.update = function () {
 
         if (!entity.removeFromWorld) {
             entity.update();
+            if (entity instanceof PlayGame) {
+                if (entity.game.running != null && entity.game.running) {
+                    this.actualTime.tick();
+                }
+            }
         }
     }
 
@@ -102,11 +162,23 @@ GameEngine.prototype.update = function () {
     }
 }
 
+GameEngine.prototype.reset = function () {
+    for (var i = 0; i < this.entities.length; i++) {
+        this.entities[i].reset();
+
+    }
+    //console.log(this.actualTime.gameTime);
+    // this.actualTime.gameTime = 0;
+
+}
+
 GameEngine.prototype.loop = function () {
     this.clockTick = this.timer.tick();
     this.update();
     this.draw();
     this.space = null;
+    this.click = null;
+    this.wheel = null;
 }
 
 function Entity(game, x, y) {
@@ -117,6 +189,11 @@ function Entity(game, x, y) {
 }
 
 Entity.prototype.update = function () {
+
+}
+
+Entity.prototype.reset = function () {
+
 }
 
 Entity.prototype.draw = function (ctx) {
