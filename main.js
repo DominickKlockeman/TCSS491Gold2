@@ -129,10 +129,12 @@ function BoundingBox(x, y, width, height) {
     this.bottom = this.top + height;
 }
 
-BoundingBox.prototype.collide = function (oth) {
-
-    if (this.right > oth.left) return true;
-
+BoundingBox.prototype.collide = function (other) {
+    if (this.right - other.left <= 7 && this.right - other.left >= 0) {
+        if (this.bottom >= other.top) {
+            return true;
+        }
+    }
     return false;
 }
 
@@ -173,8 +175,7 @@ PlayGame.prototype.draw = function (ctx) {
             if (this.game.mouse != null && this.game.mouse.x >= 346 && this.game.mouse.x <= 480 && 
                 this.game.mouse.y >= 265 && this.game.mouse.y <= 300) {
                 ctx.fillStyle = "white";
-                ctx.fillText("Replay?", 346, 300);
-                
+                ctx.fillText("Replay?", 346, 300); 
             }
             
         } else {
@@ -189,17 +190,18 @@ PlayGame.prototype.draw = function (ctx) {
 /******************************************************************************************/
 
 function Character(game) {
-
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
     this.jumping = false;
     this.dead = false;
-    this.block = game.block;
+    // this.block = game.block;
+    this.spike = game.spike;
     game.alive = !this.dead;
     // this.radius = 100;
     this.ground = 350;
-    this.boundingbox = new BoundingBox(this.x + 65, this.y, this.animation.frameWidth - 0.10, this.animation.frameHeight - 15);
+    console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, -64, 350);
 }
 
@@ -221,25 +223,15 @@ Character.prototype.update = function () {
                 Character.animation = cubeSlideBeginning;
             }
             var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;
-            var totalHeight = 200;
+            var totalHeight = 400;
 
             if (jumpDistance > 0.5)
                 jumpDistance = 1 - jumpDistance;
-
-                //var height = jumpDistance * 2 * totalHeight;
-                var height = totalHeight*(-10 * (jumpDistance * jumpDistance - jumpDistance));
+                var height = totalHeight*(-2 * (jumpDistance * jumpDistance - jumpDistance));
                 this.y = this.ground - height;
-                //console.log("j");
-        } else {
-            // console.log("nj");
-            // console.log(this.block.boundingbox.x);
-            // console.log("Cube" + this.boundingbox.x);
-            // console.log("Block" + this.block.boundingbox);
-            // console.log("");
-            this.boundingbox = new BoundingBox(this.x + 65, this.y + 10, this.animation.frameWidth -40, this.animation.frameHeight - 20);
-            if(this.boundingbox.collide(this.game.block.boundingbox)) this.dead = true;
-        
         }
+        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+        if (this.boundingbox.collide(this.game.spike.boundingbox)) this.dead = true;   
     }
     Entity.prototype.update.call(this);
 }
@@ -253,16 +245,15 @@ Character.prototype.draw = function (ctx) {
             this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         }
         else {
-            ctx.lineWidth = 10;
-            ctx.strokeStyle = "blue";
-            //ctx.strokeRect(this.x + 64, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
             if (this.x < 0) {
                 this.x += 1;
             }
             this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         }
     }
-
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "blue";
+    ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
     Entity.prototype.draw.call(this);
 }
 Character.prototype.reset = function() {
@@ -275,11 +266,11 @@ Character.prototype.reset = function() {
 /******************************************************************************************/
 
 function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
     // this.radius = 100;
     this.ground = 350;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 800, 350);
 }
 
@@ -288,11 +279,11 @@ Block.prototype.constructor = Block;
 
 Block.prototype.reset = function() {
     this.x = 800;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 Block.prototype.update = function () {
     if (this.game.running) {
-        this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
+        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     }
     
     Entity.prototype.update.call(this);
@@ -307,7 +298,7 @@ Block.prototype.draw = function (ctx) {
         ctx.lineWidth = 10;
         ctx.strokeStyle = "blue";
         //ctx.strokeRect(this.x + 60, this.y + 64, this.animation.frameWidth , this.animation.frameHeight);
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 5, this.y, 3);
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 10, this.y, 3);
     }
    
     Entity.prototype.draw.call(this);
@@ -319,16 +310,24 @@ Block.prototype.draw = function (ctx) {
 
 function Spike(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
-    // this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, this.animation.frameWidth - 40, this.animation.frameHeight - 20);
-    // this.radius = 100;
     this.ground = 350;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 500, 350);
 }
 
 Spike.prototype = new Entity();
 Spike.prototype.constructor = Spike;
 
+
+Spike.prototype.reset = function() {
+    this.x = 800;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+}
+
 Spike.prototype.update = function () {
+    if (this.game.running) {
+        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+    }
     Entity.prototype.update.call(this);
 }
 
@@ -336,7 +335,15 @@ Spike.prototype.draw = function (ctx) {
     if(this.x < -64) {
         this.x = 800;
     }
-    this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 3, this.y, 3);
+    if (this.game.running) {
+        if(this.x < -64) {
+            this.x = 800; 
+        }
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 7, this.y, 3);
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+    }
     Entity.prototype.draw.call(this);
 }
 
@@ -375,13 +382,16 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(character);
     gameEngine.character = character;
 
-    let block = new Block(gameEngine);
-    gameEngine.addEntity(block);
-    gameEngine.block = block;
+    // let block = new Block(gameEngine);
+    // gameEngine.addEntity(block);
+    // gameEngine.block = block;
+    let spike = new Spike(gameEngine);
+    gameEngine.addEntity(spike);
+    gameEngine.spike = spike;
     gameEngine.running = false;
 
     //gameEngine.addEntity(new Block(gameEngine));
-    //gameEngine.addEntity(new Spike(gameEngine));
+    // gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
 });
