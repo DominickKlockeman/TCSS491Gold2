@@ -203,6 +203,7 @@ function Character(game) {
     this.falling = false;
     this.dead = false;
     this.height = 0;
+    this.lastBottom = 350;
     game.alive = !this.dead;
     this.ground = 350;
     console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
@@ -220,11 +221,9 @@ Character.prototype.update = function () {
             this.game.reset();
             return;
         }
-        if (this.y < 350 && !this.boundingbox.bottom >= this.game.entities[4].boundingbox.top) {
-            this.falling = true;
-        } else {
-            this.falling = false;
-        }
+        if (this.boundingbox.bottom < this.ground) {
+            // this.falling = true;
+        } 
         if (this.game.space && !this.falling) {
             this.jumping = true;
         }
@@ -242,10 +241,14 @@ Character.prototype.update = function () {
             }  
             height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));        
             this.y = this.ground - height;
-           
         }
         if (this.falling) {
-           
+            this.y += this.game.clockTick / this.jumpAnimation.totalTime * 4 * this.jumpHeight;
+            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64)
+            if (this.boundingbox.bottom === this.ground || 
+            this.boundingbox.bottom === this.game.entities[4].boundingbox.top) {
+                this.falling = false;
+            }
         }
         this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
       
@@ -357,6 +360,39 @@ Spike.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
+function Wall(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.ground = 350;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+    Entity.call(this, game, 1000, 296);
+}
+
+Wall.prototype = new Entity();
+Wall.prototype.constructor = Wall;
+
+Wall.prototype.reset = function() {
+    this.x = 1000;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+}
+Wall.prototype.update = function () {
+    if (this.game.running) {
+        this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+    }  
+    Entity.prototype.update.call(this);
+}
+
+Wall.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        if(this.x < -64) {
+            this.x = 800; 
+        }  
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 7, this.y, 3);     
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "blue";
+        ctx.strokeRect(this.x + 64, this.y, 64, 192);
+    }
+    Entity.prototype.draw.call(this);
+}
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -370,8 +406,10 @@ ASSET_MANAGER.queueDownload("./img/cube_slide.png");
 ASSET_MANAGER.queueDownload("./img/cube_jump.png");
 ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
+ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
+
 
 
 ASSET_MANAGER.downloadAll(function () {
@@ -390,7 +428,8 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Spike(gameEngine));
-    gameEngine.addEntity(new Block(gameEngine));
+    // gameEngine.addEntity(new Block(gameEngine));
+    gameEngine.addEntity(new Wall(gameEngine));
     gameEngine.running = false;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
