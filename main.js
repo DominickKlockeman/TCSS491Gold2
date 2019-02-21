@@ -1,3 +1,6 @@
+soundPlayer = new Audio("MiddleChild.mp3");
+soundPlayer.play();
+
 function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
     this.spriteSheet = spriteSheet;
     this.startX = startX;
@@ -145,6 +148,113 @@ BoundingBox.prototype.collide = function (other) {
     }
     return false;
 }
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+HandleClicks = function(game, startX, endX, startY, endY, func) {
+    if(game.click != null && game.click.x >= startX &&
+        game.click.x <= endX && game.click.y >= startY &&
+        game.click.y <= endY) {
+            game.inmenus = true;
+            if(func == "single"){
+                game.inmenus = false;
+                game.running = true;
+                game.actualTime.gameTime = 0;
+            } else if(func == "multi") {
+                game.inmenus = false;
+                game.actualTime.gameTime = 0;
+                game.multi = true;
+                game.mainmenu = false;
+            } else if(func == "naked") {
+                game.naked = true; 
+                game.mainmenu = false;
+            } else if(func == "controls") {
+                game.controls = true;
+                game.mainmenu = false;
+            } else if(func == "credits") {
+                game.credits = true; 
+                game.mainmenu = false;
+            } else if(func == "credits back") {
+                game.credits = false;
+                game.mainmenu = true; 
+            } else if(func == "dead") {
+                game.endscreen = true; 
+            } else if(func == "leaderboard") {
+                game.leaderboard = true; 
+                game.mainmenu = false;
+            } else if(func == "end game main menu") {
+                game.alive = true;
+                game.mainmenu = true;
+            }
+        }
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+HighlightSelection = function(ctx, game, startX, endX, startY, endY, func) {
+    if (game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
+        game.mouse.y >= startY && game.mouse.y <= endY) {
+            ctx.fillStyle = "white";
+            if(func == "single"){
+                ctx.fillText("Single Player", 300, 150);
+
+            } else if(func == "multi") {
+                ctx.fillText("Multi Player", 310, 200);
+
+            } else if(func == "naked") {
+                ctx.fillText("Naked", 350, 250); 
+
+            } else if(func == "controls") {
+                ctx.fillText("Controls", 330, 300);
+
+            } else if(func == "credits") {
+                ctx.fillText("Credits", 340, 400);
+
+            } else if(func == "credits back") {
+                ctx.fillText("Return to Main Menu", 480, 480);
+
+            } else if(func == "dead") {
+                ctx.fillText("Replay", 346, 250);
+
+            } else if(func == "leaderboard") {
+                ctx.fillText("Leaderboard", 300, 350);
+
+            } else if(func == "end game main menu") {
+                ctx.fillText("Return to Main Menu", 250, 300);
+            }
+        }
+}
+
+ReturnToMainMenu = function(ctx, game) {
+    ctx.font = "25pt Impact";
+    ctx.fillText("Return to Main Menu", 480, 480);
+    HandleClicks(game, 480, 760, 455, 485, "credits back");
+    HighlightSelection(ctx, game, 480, 760, 455, 485, "credits back");
+} 
+
+
+
+function HandleMainMenuClicks(ctx, game) {
+    HandleClicks(game, 300, 519, 115, 151, "single");
+    HandleClicks(game, 310, 196, 170, 204, "multi");
+    HandleClicks(game, 350, 454, 220, 251, "naked");
+    HandleClicks(game, 330, 471, 273, 304, "controls");
+    HandleClicks(game, 340, 461, 371, 405, "credits");
+    HandleClicks(game, 302, 508, 321, 351, "leaderboard");
+    HighlightSelection(ctx, game, 300, 519, 115, 151, "single");
+    HighlightSelection(ctx, game, 310, 530, 170, 204, "multi");
+    HighlightSelection(ctx, game, 350, 454, 220, 251, "naked");
+    HighlightSelection(ctx, game, 330, 471, 273, 304, "controls");
+    HighlightSelection(ctx, game, 340, 461, 371, 405, "credits");
+    HighlightSelection(ctx, game, 302, 508, 321, 351, "leaderboard");
+}
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -160,33 +270,49 @@ PlayGame.prototype.reset = function () {
     this.game.running = false;
 }
 PlayGame.prototype.update = function () {
-    if (this.game.click && this.game.alive) {
-        this.game.running = true;
-    }
+    
 }
 
 PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
         ctx.font = "30pt Impact";
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "yellow";
+        
         
         if(!this.game.alive) {
-            ctx.fillText("Game Over", 325, 250);
-            ctx.fillText("Replay?", 346, 300);
-            if (this.game.click != null && this.game.click.x >= 346 &&
-                this.game.click.x <= 480 && this.game.click.y >= 265 &&
-                this.game.click.y <= 300) {
-                    this.game.running = true;
-                    this.game.actualTime.gameTime = 0;
-            }
-            if (this.game.mouse != null && this.game.mouse.x >= 346 && this.game.mouse.x <= 480 && 
-                this.game.mouse.y >= 265 && this.game.mouse.y <= 300) {
-                ctx.fillStyle = "white";
-                ctx.fillText("Replay?", 346, 300); 
-            }
+            this.game.canbepaused = false;
+            ctx.fillText("Game Over", 315, 200);
+            ctx.fillText("Replay", 346, 250);
+            ctx.fillText("Return to Main Menu", 250, 300);
+            HandleClicks(this.game, 346, 480, 220, 255, "single");
+            HighlightSelection(ctx, this.game, 346, 480, 220, 255, "dead");
+            HandleClicks(this.game, 253, 587, 270, 302, "end game main menu");
+            HighlightSelection(ctx, this.game, 253, 587, 270, 302, "end game main menu");
             
-        } else {
-            ctx.fillText("Enter the adeventure through space...", 100, 250);
+        } else if (this.game.credits) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.mainmenu){
+            ctx.font = "50pt Impact";
+            ctx.fillText("Space Death Race", 150, 70);
+            ctx.font = "30pt Impact";
+            ctx.fillText("Single Player", 300, 150);
+            ctx.fillText("Multi Player", 310, 200);
+            ctx.fillText("Naked", 350, 250);
+            ctx.fillText("Controls", 330, 300);
+            ctx.fillText("Leaderboard", 300, 350);
+            ctx.fillText("Credits", 340, 400);
+            HandleMainMenuClicks(ctx, this.game);
+            
+        } else if (this.game.controls) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.naked) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.leaderboard) {
+            ctx.fillText("Dominick       20.001", 250, 100);
+            ctx.fillText("Allen                 18.345", 250, 150);
+            ctx.fillText("Giovanni         15.790", 250, 200);
+            ctx.fillText("Andrew             2.999", 250, 250);
+            ReturnToMainMenu(ctx, this.game);
         }
     }
 }
@@ -283,8 +409,59 @@ Character.prototype.reset = function() {
 /******************************************************************************************/
 /******************************************************************************************/
 
+function Credits(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/credits.png"), 0, 0, 800, 500, .2, 0, true, false);
+    this.ground = 400;
+    Entity.call(this, game, 100, 100);
+}
+
+Credits.prototype = new Entity();
+Credits.prototype.constructor = Credits;
+
+Credits.prototype.update = function() {
+    Entity.prototype.update.call(this);
+}
+
+Credits.prototype.draw = function(ctx) {
+    if(this.game.credits && !this.game.runnning) {
+        this.animation.drawFrame(this.game.clockTick, ctx, 0, 0, 0);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+/*function SloMo(game, x, y, gnd) {
+    this.ground = gnd;
+    this.x = x;
+    this.y = y;
+    this.boundingbox = new BoundingBox(this.x);
+    Entity.call(this, game, 200, 100);
+}
+
+SloMo.prototype = new Entity();
+SloMo.prototype.constructor = SlowMo;
+
+SloMo.prototype.update = function() {
+
+}
+
+SloMo.prototype.draw = function() {
+
+}
+
+
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
 function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.50, 2, true, false);
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 1000, 350);
@@ -372,6 +549,7 @@ ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
+ASSET_MANAGER.queueDownload("./img/credits.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
@@ -391,7 +569,10 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(new Block(gameEngine));
-    gameEngine.running = false;
+    gameEngine.addEntity(new Credits(gameEngine));
+ //   gameEngine.addEntity(new HandleClicks(gameEngine));
+ //   gameEngine.addEntity(new HighlightSelection(gameEngine));
+ //   gameEngine.mainmenu = true;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
 });
