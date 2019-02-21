@@ -807,8 +807,6 @@ ASSET_MANAGER.downloadAll(function () {
 
 
     gameEngine.addEntity(new Character(gameEngine)); 
-    gameEngine.addEntity(new Spike(gameEngine));
-    gameEngine.addEntity(new Block(gameEngine));
     gameEngine.addEntity(new Credits(gameEngine));
  //   gameEngine.addEntity(new HandleClicks(gameEngine));
  //   gameEngine.addEntity(new HighlightSelection(gameEngine));
