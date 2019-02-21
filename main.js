@@ -526,6 +526,7 @@ function Platform(game, x, y, width, height, color) {
     this.boundingbox = new BoundingBox(x, y, width, height);
     this.color = color;
     Entity.call(this, game, x, y);
+}
 
 Platform.prototype = new Entity();
 
