@@ -30,6 +30,7 @@ Timer.prototype.tick = function () {
 
 function VisibleTimer(game) {
     this.game = game;
+    this.runTime = null;
     Entity.call(this, game, 695, 100);
 }
 
@@ -37,9 +38,21 @@ VisibleTimer.prototype = new Entity();
 VisibleTimer.prototype.constructor = VisibleTimer;
 
 VisibleTimer.prototype.draw = function(ctx) {
-    ctx.font = "24pt Impact";
-    ctx.fillStyle = "red";
-    ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+    if (this.game.running) {
+        ctx.font = "24pt Impact";
+        ctx.fillStyle = "yellow";
+        ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
+        this.runTime = this.game.actualTime.gameTime.toFixed(3);
+    } else if(this.game.inmenus) {
+        
+    } else {
+        if (this.runTime != null) {
+            ctx.font = "24pt Impact";
+            ctx.fillStyle = "red";
+            ctx.fillText(this.runTime, 695, 100);
+        }
+    } 
+    
 }
 
 function GameEngine() {
@@ -51,6 +64,16 @@ function GameEngine() {
     this.wheel = null;
     this.surfaceWidth = null;
     this.surfaceHeight = null;
+    this.credits = false;
+    this.mainmenu = true;
+    this.controls = false;
+    this.multi = false;
+    this.leaderboard = false;
+    this.naked = false;
+    this.endscreen = false;
+    this.running = false;
+    this.inmenus = true;
+    this.ispaused = false;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -79,23 +102,40 @@ GameEngine.prototype.startInput = function () {
         var x = e.clientX - that.ctx.canvas.getBoundingClientRect().left;
         var y = e.clientY - that.ctx.canvas.getBoundingClientRect().top;
 
-        if (x < 1024) {
-            x = Math.floor(x / 32);
-            y = Math.floor(y / 32);
-        }
+        // if (x < 1024) {
+        //     x = Math.floor(x / 32);
+        //     y = Math.floor(y / 32);
+        // }
 
         return { x: x, y: y };
     }
 
     var that = this;
 
-    this.ctx.canvas.addEventListener("keydown", function (e) {
-        if (String.fromCharCode(e.which) === ' ') that.space = true;
-        e.preventDefault();
-    }, false);
-
     this.ctx.canvas.addEventListener("click", function (e) {
         that.click = getXandY(e);
+        console.log(that.click.x + " " + that.click.y);
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousemove", function (e) {
+        that.mouse = getXandY(e);
+    }, false);
+
+    this.ctx.canvas.addEventListener("mouseleave", function (e) {
+        that.mouse = null;
+    }, false);
+
+    this.ctx.canvas.addEventListener("mousewheel", function (e) {
+        that.wheel = e;
+        e.preventDefault();
+    }, false);
+    this.ctx.canvas.addEventListener("keydown", function (e) {
+        if (String.fromCharCode(e.which) === ' ') that.space = true;
+        // if (String.fromCharCode(e.which) === 'P' && that.canbepaused) {
+        //     that.ispaused = !that.ispaused;
+        //     console.log(that.ispaused);
+        // }
+        e.preventDefault();
     }, false);
 
     console.log('Input started');
@@ -117,6 +157,10 @@ GameEngine.prototype.draw = function () {
 
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
+
+    if(this.running) {
+        this.canbepaused = true;
+    }
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
@@ -149,10 +193,14 @@ GameEngine.prototype.reset = function () {
 }
 
 GameEngine.prototype.loop = function () {
-    this.clockTick = this.timer.tick();
-    this.update();
+    if(!this.ispaused) {
+        this.update();
+        this.clockTick = this.timer.tick();
+    }
     this.draw();
     this.space = null;
+    this.click = null;
+    this.wheel = null;
 }
 
 function Entity(game, x, y) {
