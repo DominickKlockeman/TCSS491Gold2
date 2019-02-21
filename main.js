@@ -365,6 +365,7 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.block = block;
     gameEngine.running = false;
 
+    // gamengine
     //gameEngine.addEntity(new Block(gameEngine));
     //gameEngine.addEntity(new Spike(gameEngine));
     gameEngine.addEntity(timer);
