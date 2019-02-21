@@ -71,6 +71,8 @@ function Background(game, spritesheet) {
     this.radius = 200;
 };
 
+
+//
 Background.prototype.draw = function () {
     this.ctx.drawImage(this.spritesheet,
     this.x, this.y);
