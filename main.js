@@ -638,7 +638,7 @@ function createMap(platforms, spikes, gameEngine){
     *Spikes in tunnel
     */
 
-   start = 1650;
+   start = 1590;
 
    for(var i = 0; i < 12; i++){
        
