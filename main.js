@@ -367,20 +367,20 @@ Character.prototype.update = function () {
         
 
             
-            for (let i =0; i < this.game.blocks.length; i++){
-                let currentPlatform = this.game.blocks[i];
+            // for (let i =0; i < this.game.blocks.length; i++){
+            //     let currentPlatform = this.game.blocks[i];
 
-                if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top
-                && currentPlatform instanceof Block){
-                    console.log("shouldve jumped onto platform");
-                    this.jumping = false;
-                    this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                    this.block = currentPlatform;
-                    this.jumpAnimation.elapsedTime = 0;
+            //     if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top
+            //     && currentPlatform instanceof Block){
+            //         console.log("shouldve jumped onto platform");
+            //         this.jumping = false;
+            //         this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
+            //         this.block = currentPlatform;
+            //         this.jumpAnimation.elapsedTime = 0;
 
-                }  
+            //     }  
 
-            }
+            // }
 
 
             for (let i =0; i < this.game.platforms.length; i++){
@@ -401,20 +401,20 @@ Character.prototype.update = function () {
 
 
 
-            for (let i =0; i < this.game.big_platforms.length; i++){
-                let currentPlatform = this.game.big_platforms[i];
+            // for (let i =0; i < this.game.big_platforms.length; i++){
+            //     let currentPlatform = this.game.big_platforms[i];
 
-                if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top
-                && currentPlatform instanceof Big_platform){
-                    console.log("shouldve jumped onto platform");
-                    this.jumping = false;
-                    this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                    this.platform = currentPlatform;
-                    this.jumpAnimation.elapsedTime = 0;
+            //     if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top
+            //     && currentPlatform instanceof Big_platform){
+            //         console.log("shouldve jumped onto platform");
+            //         this.jumping = false;
+            //         this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
+            //         this.platform = currentPlatform;
+            //         this.jumpAnimation.elapsedTime = 0;
 
-                }  
+            //     }  
 
-            }
+            // }
            
         }
 
@@ -435,7 +435,6 @@ Character.prototype.update = function () {
             
             for(let i = 0; i < this.game.platforms.length; i++){
                 let currentPlatform = this.game.platforms[i];
-                let currentBlock = this.game.blocks[i];
                 if((this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top)){
                     console.log("landed on another platform");
                     this.falling = false;
@@ -446,36 +445,6 @@ Character.prototype.update = function () {
 
             }
 
-
-
-            for(let i = 0; i < this.game.blocks.length; i++){
-                let currentPlatform = this.game.blocks[i];
-                if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom == currentPlatform.boundingbox.top){
-                    console.log("landed on another platform");
-                    this.falling = false;
-                    this.y = currentPlatform.boundingbox.top - this.animation.frameWidth - 65;
-                    this.block = currentPlatform;
-
-                }
-
-            }
-
-            for(let i = 0; i < this.game.big_platforms.length; i++){
-                let currentPlatform = this.game.big_platforms[i];
-                if(this.boundingbox.collide(currentPlatform.boundingbox) && this.lastBottom < currentPlatform.boundingbox.top){
-                    console.log("landed on another platform");
-                    this.falling = false;
-                    this.y = currentPlatform.boundingbox.top - this.animation.frameWidth - 65;
-                    this.big_platform = currentPlatform;
-
-                }
-
-            }
-
-
-
-
-
             
         }
 
@@ -484,18 +453,9 @@ Character.prototype.update = function () {
         
         if (!this.jumping && !this.falling) {
 
-            //console.log("sliding");
-            //console.log("LEFT : " + this.boundingbox.left + "> RIGHT: " + this.platform.boundingbox.right);
+
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 
-             if(((this.boundingbox.left >= this.block.boundingbox.right) && this.boundingbox.bottom > this.block.boundingbox.top)){
-                this.falling = true;
-                console.log("should fall in block");
-            }else if(this.boundingbox.left >= this.big_platform.boundingbox.right){
-                this.falling = true;
-            }else if(this.boundingbox.bottom < this.block.boundingbox.top){
-                this.falling = false;
-            }
 
 
 
@@ -505,20 +465,6 @@ Character.prototype.update = function () {
         for (let i = 0; i < this.game.platforms.length; i++) {
             var pf = this.game.platforms[i];
             if (this.boundingbox.collide(pf.boundingbox)) {
-                this.dead = true;
-            }
-        }
-
-        for (let i = 0; i < this.game.blocks.length; i++) {
-            var pf = this.game.blocks[i];
-            if (this.boundingbox.collide(pf.boundingbox)) {
-                this.dead = true;
-            }
-        }
-
-        for (let i = 0; i < this.game.spikes.length; i++) {
-            let currentPlatform = this.game.spikes[i];
-            if (this.boundingbox.collide(currentPlatform.boundingbox)) {
                 this.dead = true;
             }
         }
@@ -819,60 +765,28 @@ Big_platform.prototype.draw = function (ctx) {
 
 
 
-function createMap(platforms, spikes, big_platforms, blocks, gameEngine){
+function createMap(platforms,gameEngine){
 
-    let spike;
-    let start;
+
     let currentPlatform;
-    let big_platform;
-    let block;
-
-    block = new Block(gameEngine,400,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,460,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,520,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,580,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,640,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
 
 
-    big_platform = new Big_platform(gameEngine, 800, 200);
-    gameEngine.addEntity(big_platform);
-    big_platforms.push(big_platform);
+    currentPlatform = new Block(gameEngine, 500, 275);
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Block(gameEngine, 560, 275);
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Block(gameEngine, 620, 275);
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Block(gameEngine, 680, 275);
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
 
-
-    block = new Block(gameEngine,1600,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,1660,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-    block = new Block(gameEngine,1720,270);
-    gameEngine.addEntity(block);
-    blocks.push(block);
-
-
-
-    // block = new Block(gameEngine,1700,175);
-    // gameEngine.addEntity(block);
-    // blocks.push(block);
-    // block = new Block(gameEngine,1900,150);
-    // gameEngine.addEntity(block);
-    // blocks.push(block);
-    // block = new Block(gameEngine,2200,125);
-    // gameEngine.addEntity(block);
-    // blocks.push(block);
-    // block = new Block(gameEngine,2400,100);
-    // gameEngine.addEntity(block);
-    // blocks.push(block);
+    currentPlatform = new Big_platform(gameEngine, 750, 225);
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
 
 
     //GROUND
@@ -929,7 +843,7 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
     
 
-    createMap(platforms, spikes, big_platforms, blocks, gameEngine);
+    createMap(platforms,gameEngine);
 
 
     gameEngine.addEntity(new Character(gameEngine)); 
