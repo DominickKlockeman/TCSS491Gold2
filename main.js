@@ -919,7 +919,8 @@ ASSET_MANAGER.downloadAll(function () {
 
 
     var masters = [];
- 
+    gameEngine.masters = masters;
+    
     gameEngine.init(ctx);
     gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
