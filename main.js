@@ -56,6 +56,21 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
+function ReadString(entityString, height) {
+    for (i = 0; i < entityString.length; i++) {
+        // setTimeout(function() {
+            console.log(entityString.charAt(i));
+            if (entityString.charAt(i) === 'X') { // Spike
+                Entity.call(this.game.entities[3], game, 800, height);
+            } else if (entityString.charAt(i) === 'O') { // Block
+                Entity.call(this.game.entities[4], game, 800, height);
+            } else if (entityString.charAt(i) === 'I') { // Wall
+                Entity.call(this.game.entities[5], game, 800, height);
+            }       
+        // }, 100);       
+    }
+}
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -67,8 +82,6 @@ function Background(game, spritesheet) {
     this.spritesheet = spritesheet;
     this.game = game;
     this.ctx = game.ctx;
-    // Entity.call(this, game, 0, 400);
-    this.radius = 200;
 };
 
 Background.prototype.draw = function () {
@@ -78,13 +91,10 @@ Background.prototype.draw = function () {
 
 Background.prototype.update = function () {
     this.x += 1;
-    if(this.x > 0) this.x = -800;
+    if (this.x > 0) this.x = -800;
 }
 
-Background.prototype.reset = function () {
-
-}
-
+Background.prototype.reset = function (){}
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -104,13 +114,10 @@ Foreground.prototype.draw = function () {
 
 Foreground.prototype.update = function () {
     this.x -= 1;
-    if(this.x < -800) this.x = 0;
+    if (this.x < -800) this.x = 0;
 }
 
-Foreground.prototype.reset = function() {
-
-}
-
+Foreground.prototype.reset = function (){}
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -168,8 +175,7 @@ PlayGame.prototype.update = function () {
 PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
         ctx.font = "30pt Impact";
-        ctx.fillStyle = "red";
-        
+        ctx.fillStyle = "red";     
         if(!this.game.alive) {
             ctx.fillText("Game Over", 325, 250);
             ctx.fillText("Replay?", 346, 300);
@@ -183,8 +189,7 @@ PlayGame.prototype.draw = function (ctx) {
                 this.game.mouse.y >= 265 && this.game.mouse.y <= 300) {
                 ctx.fillStyle = "white";
                 ctx.fillText("Replay?", 346, 300); 
-            }
-            
+            }           
         } else {
             ctx.fillText("Enter the adeventure through space...", 100, 250);
         }
@@ -254,7 +259,9 @@ Character.prototype.update = function () {
       
         if (this.boundingbox.climb(this.game.entities[4])) {
             this.ground -= 64; 
-        } else if (this.boundingbox.collide(this.game.entities[3]) || this.boundingbox.collide(this.game.entities[4])) {
+        } else if (this.boundingbox.collide(this.game.entities[3]) 
+        || this.boundingbox.collide(this.game.entities[4]) 
+        || this.boundingbox.collide(this.game.entities[5])) {
             this.dead = true;  
         }    
         
@@ -290,14 +297,16 @@ function Block(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    Entity.call(this, game, 1000, 350);
+    // Entity.call(this, game, 600, 350);
+    Entity.call(this, game, -500, 350);
 }
 
 Block.prototype = new Entity();
 Block.prototype.constructor = Block;
 
 Block.prototype.reset = function() {
-    this.x = 1000;
+    // this.x = 600;
+    this.x = -500;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 Block.prototype.update = function () {
@@ -309,15 +318,14 @@ Block.prototype.update = function () {
 
 Block.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if(this.x < -64) {
-            this.x = 800; 
-        }  
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 7, this.y, 3);     
+        if (this.x >= -64) {         
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);     
         ctx.lineWidth = 5;
         ctx.strokeStyle = "blue";
         ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+        Entity.prototype.draw.call(this);
+        }
     }
-    Entity.prototype.draw.call(this);
 }
 
 /******************************************************************************************/
@@ -328,15 +336,16 @@ function Spike(game) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.ground = 350;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    Entity.call(this, game, 400, 350);
+    // Entity.call(this, game, 400, 350);
+    Entity.call(this, game, -500, 350);
 }
 
 Spike.prototype = new Entity();
 Spike.prototype.constructor = Spike;
 
-
 Spike.prototype.reset = function() {
-    this.x = 400;
+    // this.x = 400;
+    this.x = -500;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
@@ -349,15 +358,14 @@ Spike.prototype.update = function () {
 
 Spike.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if (this.x < -64) {
-            this.x = 800; 
+        if (this.x >= -64) {
+            this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "blue";
+            ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+            Entity.prototype.draw.call(this);
         }
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 7, this.y, 3);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-    }
-    Entity.prototype.draw.call(this);
+    }  
 }
 
 function Wall(game) {
@@ -383,15 +391,14 @@ Wall.prototype.update = function () {
 
 Wall.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if(this.x < -64) {
-            this.x = 800; 
-        }  
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 7, this.y, 3);     
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y, 64, 192);
+        if (this.x >= -64) {
+            this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);     
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "blue";
+            ctx.strokeRect(this.x + 64, this.y, 64, 192);
+            Entity.prototype.draw.call(this);
+        }             
     }
-    Entity.prototype.draw.call(this);
 }
 
 /******************************************************************************************/
@@ -410,8 +417,6 @@ ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
 
-
-
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
@@ -428,10 +433,12 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Spike(gameEngine));
-    // gameEngine.addEntity(new Block(gameEngine));
+    gameEngine.addEntity(new Block(gameEngine));
     gameEngine.addEntity(new Wall(gameEngine));
     gameEngine.running = false;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
+    // setTimeout(function() {
+    ReadString("----O-----X----I", 500);
 });
 
