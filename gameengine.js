@@ -1,5 +1,7 @@
 // This game shell was happily copied from Googler Seth Ladd's "Bad Aliens" game and his Google IO talk in 2011
 
+var menuBackgroundSound = new Audio("backgroundMusic.mp3");
+
 window.requestAnimFrame = (function () {
     return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -74,6 +76,8 @@ function GameEngine() {
     this.running = false;
     this.inmenus = true;
     this.ispaused = false;
+    this.volume = 3;
+    this.song = menuBackgroundSound;
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -131,10 +135,16 @@ GameEngine.prototype.startInput = function () {
     }, false);
     this.ctx.canvas.addEventListener("keydown", function (e) {
         if (String.fromCharCode(e.which) === ' ') that.space = true;
-        // if (String.fromCharCode(e.which) === 'P' && that.canbepaused) {
-        //     that.ispaused = !that.ispaused;
-        //     console.log(that.ispaused);
-        // }
+        if (String.fromCharCode(e.which) === 'P' && that.canbepaused) {
+            that.ispaused = !that.ispaused;
+            that.song.pause();
+        }
+        if (String.fromCharCode(e.which) === 'W') that.w = true;
+        e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("keyup", function (e) {
+        if (String.fromCharCode(e.which) === ' ') that.space = false;
         e.preventDefault();
     }, false);
 
@@ -196,11 +206,16 @@ GameEngine.prototype.loop = function () {
     if(!this.ispaused) {
         this.update();
         this.clockTick = this.timer.tick();
+        this.draw();
     }
-    this.draw();
-    this.space = null;
+    this.w = null;
     this.click = null;
     this.wheel = null;
+    this.space = null;
+    // this.draw();
+    // this.space = null;
+    // this.click = null;
+    // this.wheel = null;
 }
 
 function Entity(game, x, y) {
