@@ -1,3 +1,41 @@
+var menuSelectSound = new Audio("MeleeMenuSelect Sound.mp3");
+var gameBackgroundSound = new Audio("gameMusic.mp3");
+
+menuSelectSound.volume = .6;
+playSound = function() {
+    menuSelectSound.play();
+
+}
+
+volumeSelect = function(selectedVolume) {
+
+    if(selectedVolume == "0.0") {
+        menuSelectSound.volume = 0;
+        menuBackgroundSound.volume = 0;
+        gameBackgroundSound.volume = 0;
+    } else if(selectedVolume == "0.2") {
+        menuSelectSound.volume = 0.2;
+        menuBackgroundSound.volume = 0.2;
+        gameBackgroundSound.volume = 0.2;
+    } else if(selectedVolume == "0.4") {
+        menuSelectSound.volume = 0.4;
+        menuBackgroundSound.volume = 0.4;
+        gameBackgroundSound.volume = 0.4;
+    } else if(selectedVolume == "0.6") {
+        menuSelectSound.volume = 0.6;
+        menuBackgroundSound.volume = 0.6;
+        gameBackgroundSound.volume = 0.6;
+    } else if(selectedVolume == "0.8") {
+        menuSelectSound.volume = 0.8;
+        menuBackgroundSound.volume = 0.8;
+        gameBackgroundSound.volume = 0.8;
+    } else if(selectedVolume == "1.0") {
+        menuSelectSound.volume = 1.0;
+        menuBackgroundSound.volume = 1.0;
+        gameBackgroundSound.volume = 1.0;
+    }
+
+}
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -126,6 +164,7 @@ function BoundingBox(x, y, width, height) {
 }
 
 BoundingBox.prototype.collide = function (other) {
+
     if (this.right >= other.left && this.left <= other.right && this.top <= other.bottom && this.bottom >= other.top) {
         return true;
     }
@@ -140,19 +179,25 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
     if(game.click != null && game.click.x >= startX &&
         game.click.x <= endX && game.click.y >= startY &&
         game.click.y <= endY) {
+            playSound();
+            game.song.play();
             game.inmenus = true;
             if(func == "single"){
+                console.log("here");
+                game.canbepaused = true;
+                game.song.pause();
                 game.inmenus = false;
                 game.running = true;
+                game.song = gameBackgroundSound;
                 game.actualTime.gameTime = 0;
             } else if(func == "multi") {
-                game.inmenus = false;
+                //game.inmenus = false;
                 game.actualTime.gameTime = 0;
                 game.multi = true;
-                game.mainmenu = false;
+                //game.mainmenu = false;
             } else if(func == "naked") {
                 game.naked = true; 
-                game.mainmenu = false;
+                //game.mainmenu = false;
             } else if(func == "controls") {
                 game.controls = true;
                 game.mainmenu = false;
@@ -161,6 +206,8 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.mainmenu = false;
             } else if(func == "credits back") {
                 game.credits = false;
+                game.controls = false;
+                game.leaderboard = false;
                 game.mainmenu = true; 
             } else if(func == "dead") {
                 game.endscreen = true; 
@@ -168,8 +215,10 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.leaderboard = true; 
                 game.mainmenu = false;
             } else if(func == "end game main menu") {
+                game.song.pause();
                 game.alive = true;
                 game.mainmenu = true;
+                game.song = menuBackgroundSound;
             }
         }
 }
@@ -183,26 +232,34 @@ HighlightSelection = function(ctx, game, startX, endX, startY, endY, func) {
     if (game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
         game.mouse.y >= startY && game.mouse.y <= endY) {
             ctx.fillStyle = "white";
-         if(func == "single"){
-             ctx.fillText("Single Player", 300, 150);
-        } else if(func == "multi") {
-            ctx.fillText("Multi Player", 310, 200);
-        } else if(func == "naked") {
-            ctx.fillText("Naked", 350, 250); 
-         } else if(func == "controls") {
-            ctx.fillText("Controls", 330, 300);
-        } else if(func == "credits") {
-            ctx.fillText("Credits", 340, 400);
-        } else if(func == "credits back") {
-            ctx.fillText("Return to Main Menu", 480, 480);
-        } else if(func == "dead") {
-            ctx.fillText("Replay", 346, 250);
-         } else if(func == "leaderboard") {
-             ctx.fillText("Leaderboard", 300, 350);
-         } else if(func == "end game main menu") {
-            ctx.fillText("Return to Main Menu", 250, 300);
+            if(func == "single"){
+                ctx.fillText("Single Player", 300, 150);
+
+            } else if(func == "multi") {
+                ctx.fillText("Multi Player", 310, 200);
+
+            } else if(func == "naked") {
+                ctx.fillText("Naked", 350, 250); 
+
+            } else if(func == "controls") {
+                ctx.fillText("Controls", 330, 300);
+
+            } else if(func == "credits") {
+                ctx.fillText("Credits", 340, 400);
+
+            } else if(func == "credits back") {
+                ctx.fillText("Return to Main Menu", 480, 480);
+
+            } else if(func == "dead") {
+                ctx.fillText("Replay", 346, 250);
+
+            } else if(func == "leaderboard") {
+                ctx.fillText("Leaderboard", 300, 350);
+
+            } else if(func == "end game main menu") {
+                ctx.fillText("Return to Main Menu", 250, 300);
+            }
         }
-    }
 }
 
 ReturnToMainMenu = function(ctx, game) {
@@ -212,9 +269,11 @@ ReturnToMainMenu = function(ctx, game) {
     HighlightSelection(ctx, game, 480, 760, 455, 485, "credits back");
 } 
 
+
+
 function HandleMainMenuClicks(ctx, game) {
     HandleClicks(game, 300, 519, 115, 151, "single");
-    HandleClicks(game, 310, 196, 170, 204, "multi");
+    HandleClicks(game, 310, 508, 170, 204, "multi");
     HandleClicks(game, 350, 454, 220, 251, "naked");
     HandleClicks(game, 330, 471, 273, 304, "controls");
     HandleClicks(game, 340, 461, 371, 405, "credits");
@@ -229,6 +288,146 @@ function HandleMainMenuClicks(ctx, game) {
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
+
+function FillVolume(num, vol, ctx) {
+    if(vol == "true") {
+        ctx.fillText("Volume", 10, 480);
+    }
+    if(num == 1) {
+        ctx.fillText("l", 145, 480); 
+    }
+    if(num == 2) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+    }
+    if(num == 3) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+    }
+    if(num == 4) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+        ctx.fillText("l", 175, 480);
+    }
+    if(num == 5) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+        ctx.fillText("l", 175, 480);
+        ctx.fillText("l", 185, 480);
+    }
+
+}
+
+function DisplayVolume(ctx, game, ctx) {
+    ctx.fillStyle = "yellow"; 
+    FillVolume(5, "true", ctx);
+    if(game.volume == 0) {
+        ctx.fillStyle = "yellow"; 
+        FillVolume(5, "", ctx);
+    } else if(game.volume == 1) {
+        ctx.fillStyle = "white";
+        FillVolume(1, "", ctx);
+    } else if(game.volume == 2) {
+        ctx.fillStyle = "white";
+        FillVolume(2, "", ctx);
+    } else if(game.volume == 3) {
+        ctx.fillStyle = "white";
+        FillVolume(3, "", ctx);
+    } else if(game.volume == 4) {
+        ctx.fillStyle = "white";
+        FillVolume(4, "", ctx);
+    } else if(game.volume == 5) {
+        ctx.fillStyle = "white";
+        FillVolume(5, "", ctx);
+    } 
+
+
+    HandleVolumeSelection(ctx, game, 11, 136, 453, 483, "0.0");
+    HandleVolumeSelection(ctx, game, 148, 158, 453, 483, "0.2");
+    HandleVolumeSelection(ctx, game, 158, 168, 453, 483, "0.4");
+    HandleVolumeSelection(ctx, game, 168, 178, 453, 483, "0.6");
+    HandleVolumeSelection(ctx, game, 178, 188, 453, 483, "0.8");
+    HandleVolumeSelection(ctx, game, 188, 198, 453, 483, "1.0");
+    HighlightVolumeSelection(ctx, game, 11, 136, 453, 483, "0.0");
+    HighlightVolumeSelection(ctx, game, 148, 158, 453, 483, "0.2");
+    HighlightVolumeSelection(ctx, game, 158, 168, 453, 483, "0.4");
+    HighlightVolumeSelection(ctx, game, 168, 178, 453, 483, "0.6");
+    HighlightVolumeSelection(ctx, game, 178, 188, 453, 483, "0.8");
+    HighlightVolumeSelection(ctx, game, 188, 198, 453, 483, "1.0");
+}
+
+function HandleVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
+    if (game.click != null && game.click.x >= startX &&
+        game.click.x <= endX && game.click.y >= startY &&
+        game.click.y <= endY) {
+            volumeSelect(func);
+            if(func == "0.0") {
+                ctx.fillStyle = "yellow"; 
+                game.volume = 0;
+            } else if(func == "0.2") {
+                game.volume = 1;
+            } else if(func == "0.4") {
+                game.volume = 2;
+            } else if(func == "0.6") {
+                game.volume = 3;
+            } else if(func == "0.8") {
+                game.volume = 4;
+            } else if(func == "1.0") {
+                game.volume = 5;
+            }
+            menuSelectSound.play();
+        }
+}
+
+function HighlightVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
+    if(game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
+        game.mouse.y >= startY && game.mouse.y <= endY) {
+            ctx.fillStyle = "white";
+            ctx.fillStyle = "yellow";
+            FillVolume(5, "", ctx);
+            if(func == "0.0") {
+                //ctx.fillStyle = "yellow";
+                //FillVolume(5, "", ctx);
+            } else if(func == "0.2") {
+                ctx.fillStyle = "white";
+                FillVolume(1, "", ctx);
+
+            } else if(func == "0.4") {
+                ctx.fillStyle = "white";
+                FillVolume(2, "", ctx);
+                
+            } else if(func == "0.6") {
+                ctx.fillStyle = "white";
+                FillVolume(3, "", ctx);
+                
+            } else if(func == "0.8") {
+                ctx.fillStyle = "white";
+                FillVolume(4, "", ctx);
+                
+            } else if(func == "1.0") {
+                ctx.fillStyle = "white";
+                FillVolume(5, "", ctx);
+                
+            }
+        }
+}
+
+function displayControls(ctx) {
+    ctx.fillText("Spacebar:  Jump", 250, 100);
+    ctx.fillText("P : pause", 300, 150);
+    ctx.fillText("Select bars to adjust Volume", 150, 200);
+    ctx.fillText("Select Volume to mute", 200, 250);
+    ctx.fillText("Avoid Spikes", 280, 300);
+    ctx.fillText("Get to the end", 275, 350);
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 
 function PlayGame(game, x, y) {
     Entity.call(this, game, x, y);
@@ -245,11 +444,13 @@ PlayGame.prototype.update = function () {
 }
 
 PlayGame.prototype.draw = function (ctx) {
+    this.game.song.pause();
+    ctx.font = "30pt Impact";
+    ctx.fillStyle = "yellow";
+    DisplayVolume(ctx, this.game, ctx, this.game.volume);
+    this.game.song.play();
     if (!this.game.running) {
-        ctx.font = "30pt Impact";
         ctx.fillStyle = "yellow";
-        
-        
         if(!this.game.alive) {
             this.game.canbepaused = false;
             ctx.fillText("Game Over", 315, 200);
@@ -275,6 +476,7 @@ PlayGame.prototype.draw = function (ctx) {
             HandleMainMenuClicks(ctx, this.game);
             
         } else if (this.game.controls) {
+            displayControls(ctx);
             ReturnToMainMenu(ctx, this.game);
         } else if(this.game.naked) {
             ReturnToMainMenu(ctx, this.game);
@@ -330,6 +532,7 @@ Character.prototype.update = function () {
                 this.jumpAnimation.elapsedTime = 0;
                 this.jumping = false;
                 Character.animation = cubeSlideBeginning;
+
             }
             var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
             var totalHeight = 400;
@@ -384,7 +587,7 @@ Character.prototype.update = function () {
             this.lastBottom = this.boundingbox.bottom;
             this.y += 15;
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-            
+        
             for (let i = 0; i < this.game.platforms.length; i++) {
                 let pf = this.game.platforms[i];
                 if (this.boundingbox.collide(pf.boundingbox) 
@@ -429,7 +632,6 @@ Character.prototype.update = function () {
         for (let i = 0; i < this.game.platforms.length; i++) {
             var pf = this.game.platforms[i];
             if (this.boundingbox.collide(pf.boundingbox)) {
-                console.log("hit platform")
                 this.dead = true;
             }
         }
@@ -583,7 +785,7 @@ function Platform(game, x, y, width, height, color) {
     this.height = height;
     this.startX = x;
     this.startY = y;
-    this.boundingbox = new BoundingBox(x + 64, y + 64, this.width, this.height);
+    this.boundingbox = new BoundingBox(x, y, width, height);
     this.color = color;
     Entity.call(this, game, x, y);
 }
@@ -772,6 +974,8 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     // let block;
     // let wall;
     // let newPlatform;
+
+    let spike;
     let start;
     let currentPlatform
     let w;
@@ -849,6 +1053,49 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     // gameEngine.addEntity(currentPlatform);
     // platforms.push(currentPlatform);
 
+
+
+    /* //UP STAIRS
+    currentPlatform = new Platform(gameEngine, 800, 325, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+
+    /*
+    *Spikes in tunnel
+    */
+
+   /*start = 1590;
+
+   for(var i = 0; i < 12; i++){
+       
+       start = start + 65;
+       
+
+       spike = new Spike(gameEngine, start , -5);
+       gameEngine.addEntity(spike);
+       spikes.push(spike);
+
+   }
+
+
+
+    //Tunnel
+    currentPlatform = new Platform(gameEngine, 1600, 200, 800, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform); */
+
     /*
     *Spike under stairs
     */
@@ -917,6 +1164,92 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     blk = new Block(gameEngine, 4500, 40);
     gameEngine.addEntity(blk);
     blocks.push(blk);
+  
+  /*
+   start = 2375;
+
+   for(var i = 0; i < 28; i++){
+    
+       start = start + 65;
+       
+
+       spike = new Spike(gameEngine, start ,270);
+       gameEngine.addEntity(spike);
+       spikes.push(spike);
+
+   }
+
+
+    //DOWNSTAIRS
+    currentPlatform = new Platform(gameEngine, 2450, 280, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 2650, 280, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 2800, 200, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 3000, 225, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 3200, 250, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 3400, 275, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+
+    spike = new Spike(gameEngine, 2700 , -200 , true);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 2900 , -200 , true);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 3100 , -200 , true);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    //UPSTAIRS
+
+    currentPlatform = new Platform(gameEngine, 3600, 250, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 3800, 225, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 4000, 200, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 4200, 225, 50, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+
+
+
+    spike = new Spike(gameEngine, 4300, 150);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 4300, 200);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 4300, 250);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 4300, 300);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+
+
+    //TUNNEL
+
+    currentPlatform = new Platform(gameEngine, 4400, 250, 1000, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+    currentPlatform = new Platform(gameEngine, 4500, 100, 1000, 50, "grey");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform); */
 
     // w = new Wall(gameEngine, 5000,-100);
     // gameEngine.addEntity(w);
@@ -990,6 +1323,12 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.addEntity(new Character(gameEngine)); 
     // gameEngine.addEntity(new Laser(gameEngine)); 
+    /*createMap(platforms, spikes, gameEngine);
+
+
+    gameEngine.addEntity(new Character(gameEngine)); 
+    gameEngine.addEntity(new Spike(gameEngine)); */
+
     gameEngine.addEntity(new Credits(gameEngine));
  //   gameEngine.addEntity(new HandleClicks(gameEngine));
  //   gameEngine.addEntity(new HighlightSelection(gameEngine));
