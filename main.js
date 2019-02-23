@@ -1,3 +1,7 @@
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
 function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
     this.spriteSheet = spriteSheet;
     this.startX = startX;
@@ -11,10 +15,6 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
     this.loop = loop;
     this.reverse = reverse;
 }
-
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y, scaleBy) {
     var scaleBy = scaleBy || 1;
@@ -56,28 +56,13 @@ Animation.prototype.isDone = function () {
     return (this.elapsedTime >= this.totalTime);
 }
 
-function ReadString(entityString, height) {
-    for (i = 0; i < entityString.length; i++) {
-        // setTimeout(function() {
-            console.log(entityString.charAt(i));
-            if (entityString.charAt(i) === 'X') { // Spike
-                Entity.call(this.game.entities[3], game, 800, height);
-            } else if (entityString.charAt(i) === 'O') { // Block
-                Entity.call(this.game.entities[4], game, 800, height);
-            } else if (entityString.charAt(i) === 'I') { // Wall
-                Entity.call(this.game.entities[5], game, 800, height);
-            }       
-        // }, 100);       
-    }
-}
-
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
 // no inheritance
 function Background(game, spritesheet) {
-    this.x = -800;
+    this.x = 0;
     this.y = 1;
     this.spritesheet = spritesheet;
     this.game = game;
@@ -90,11 +75,14 @@ Background.prototype.draw = function () {
 };
 
 Background.prototype.update = function () {
-    this.x += 1;
-    if (this.x > 0) this.x = -800;
+    this.x -= 1;
+    if (this.x < -800) this.x = 0;
 }
 
-Background.prototype.reset = function (){}
+Background.prototype.reset = function () {
+
+}
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -117,7 +105,10 @@ Foreground.prototype.update = function () {
     if (this.x < -800) this.x = 0;
 }
 
-Foreground.prototype.reset = function (){}
+Foreground.prototype.reset = function() {
+
+}
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -134,23 +125,106 @@ function BoundingBox(x, y, width, height) {
     this.bottom = this.top + height;
 }
 
-BoundingBox.prototype.climb = function (other) {
-    if (other instanceof Block) {
-        if (Math.abs(other.boundingbox.right - this.right) < 64) {
-            if (Math.abs(this.bottom - other.boundingbox.top) <= 5) {
-                return true;
-            }
-        }
+BoundingBox.prototype.collide = function (other) {
+    if (this.right >= other.left && this.left <= other.right && this.top <= other.bottom && this.bottom >= other.top) {
+        return true;
     }
     return false;
 }
-BoundingBox.prototype.collide = function (other) {
-    if (Math.abs(other.boundingbox.right - this.right) < 64) {
-        if (this.bottom > other.boundingbox.top) {
-            return true;
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+HandleClicks = function(game, startX, endX, startY, endY, func) {
+    if(game.click != null && game.click.x >= startX &&
+        game.click.x <= endX && game.click.y >= startY &&
+        game.click.y <= endY) {
+            game.inmenus = true;
+            if(func == "single"){
+                game.inmenus = false;
+                game.running = true;
+                game.actualTime.gameTime = 0;
+            } else if(func == "multi") {
+                game.inmenus = false;
+                game.actualTime.gameTime = 0;
+                game.multi = true;
+                game.mainmenu = false;
+            } else if(func == "naked") {
+                game.naked = true; 
+                game.mainmenu = false;
+            } else if(func == "controls") {
+                game.controls = true;
+                game.mainmenu = false;
+            } else if(func == "credits") {
+                game.credits = true; 
+                game.mainmenu = false;
+            } else if(func == "credits back") {
+                game.credits = false;
+                game.mainmenu = true; 
+            } else if(func == "dead") {
+                game.endscreen = true; 
+            } else if(func == "leaderboard") {
+                game.leaderboard = true; 
+                game.mainmenu = false;
+            } else if(func == "end game main menu") {
+                game.alive = true;
+                game.mainmenu = true;
+            }
+        }
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+HighlightSelection = function(ctx, game, startX, endX, startY, endY, func) {
+    if (game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
+        game.mouse.y >= startY && game.mouse.y <= endY) {
+            ctx.fillStyle = "white";
+         if(func == "single"){
+             ctx.fillText("Single Player", 300, 150);
+        } else if(func == "multi") {
+            ctx.fillText("Multi Player", 310, 200);
+        } else if(func == "naked") {
+            ctx.fillText("Naked", 350, 250); 
+         } else if(func == "controls") {
+            ctx.fillText("Controls", 330, 300);
+        } else if(func == "credits") {
+            ctx.fillText("Credits", 340, 400);
+        } else if(func == "credits back") {
+            ctx.fillText("Return to Main Menu", 480, 480);
+        } else if(func == "dead") {
+            ctx.fillText("Replay", 346, 250);
+         } else if(func == "leaderboard") {
+             ctx.fillText("Leaderboard", 300, 350);
+         } else if(func == "end game main menu") {
+            ctx.fillText("Return to Main Menu", 250, 300);
         }
     }
-    return false;
+}
+
+ReturnToMainMenu = function(ctx, game) {
+    ctx.font = "25pt Impact";
+    ctx.fillText("Return to Main Menu", 480, 480);
+    HandleClicks(game, 480, 760, 455, 485, "credits back");
+    HighlightSelection(ctx, game, 480, 760, 455, 485, "credits back");
+} 
+
+function HandleMainMenuClicks(ctx, game) {
+    HandleClicks(game, 300, 519, 115, 151, "single");
+    HandleClicks(game, 310, 196, 170, 204, "multi");
+    HandleClicks(game, 350, 454, 220, 251, "naked");
+    HandleClicks(game, 330, 471, 273, 304, "controls");
+    HandleClicks(game, 340, 461, 371, 405, "credits");
+    HandleClicks(game, 302, 508, 321, 351, "leaderboard");
+    HighlightSelection(ctx, game, 300, 519, 115, 151, "single");
+    HighlightSelection(ctx, game, 310, 530, 170, 204, "multi");
+    HighlightSelection(ctx, game, 350, 454, 220, 251, "naked");
+    HighlightSelection(ctx, game, 330, 471, 273, 304, "controls");
+    HighlightSelection(ctx, game, 340, 461, 371, 405, "credits");
+    HighlightSelection(ctx, game, 302, 508, 321, 351, "leaderboard");
 }
 /******************************************************************************************/
 /******************************************************************************************/
@@ -167,31 +241,49 @@ PlayGame.prototype.reset = function () {
     this.game.running = false;
 }
 PlayGame.prototype.update = function () {
-    if (this.game.click && this.game.alive) {
-        this.game.running = true;
-    }
+    
 }
 
 PlayGame.prototype.draw = function (ctx) {
     if (!this.game.running) {
         ctx.font = "30pt Impact";
-        ctx.fillStyle = "red";     
+        ctx.fillStyle = "yellow";
+        
+        
         if(!this.game.alive) {
-            ctx.fillText("Game Over", 325, 250);
-            ctx.fillText("Replay?", 346, 300);
-            if (this.game.click != null && this.game.click.x >= 346 &&
-                this.game.click.x <= 480 && this.game.click.y >= 265 &&
-                this.game.click.y <= 300) {
-                    this.game.running = true;
-                    this.game.actualTime.gameTime = 0;
-            }
-            if (this.game.mouse != null && this.game.mouse.x >= 346 && this.game.mouse.x <= 480 && 
-                this.game.mouse.y >= 265 && this.game.mouse.y <= 300) {
-                ctx.fillStyle = "white";
-                ctx.fillText("Replay?", 346, 300); 
-            }           
-        } else {
-            ctx.fillText("Enter the adeventure through space...", 100, 250);
+            this.game.canbepaused = false;
+            ctx.fillText("Game Over", 315, 200);
+            ctx.fillText("Replay", 346, 250);
+            ctx.fillText("Return to Main Menu", 250, 300);
+            HandleClicks(this.game, 346, 480, 220, 255, "single");
+            HighlightSelection(ctx, this.game, 346, 480, 220, 255, "dead");
+            HandleClicks(this.game, 253, 587, 270, 302, "end game main menu");
+            HighlightSelection(ctx, this.game, 253, 587, 270, 302, "end game main menu");
+            
+        } else if (this.game.credits) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.mainmenu){
+            ctx.font = "50pt Impact";
+            ctx.fillText("Space Death Race", 150, 70);
+            ctx.font = "30pt Impact";
+            ctx.fillText("Single Player", 300, 150);
+            ctx.fillText("Multi Player", 310, 200);
+            ctx.fillText("Naked", 350, 250);
+            ctx.fillText("Controls", 330, 300);
+            ctx.fillText("Leaderboard", 300, 350);
+            ctx.fillText("Credits", 340, 400);
+            HandleMainMenuClicks(ctx, this.game);
+            
+        } else if (this.game.controls) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.naked) {
+            ReturnToMainMenu(ctx, this.game);
+        } else if(this.game.leaderboard) {
+            ctx.fillText("Dominick       20.001", 250, 100);
+            ctx.fillText("Allen                 18.345", 250, 150);
+            ctx.fillText("Giovanni         15.790", 250, 200);
+            ctx.fillText("Andrew             2.999", 250, 250);
+            ReturnToMainMenu(ctx, this.game);
         }
     }
 }
@@ -202,18 +294,20 @@ PlayGame.prototype.draw = function (ctx) {
 
 function Character(game) {
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
+    cubeLaser = new Animation(ASSET_MANAGER.getAsset("./img/cube_right_laser.png"), 0, 0, 64, 64, 0.08, 8, true, false);
+    this.l = new Laser(this.game);
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
     this.jumping = false;
     this.falling = false;
     this.dead = false;
     this.height = 0;
-    this.lastBottom = 350;
     game.alive = !this.dead;
     this.ground = 350;
+    this.platform = game.platforms[0];
     console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    Entity.call(this, game, -64, 350);
+    Entity.call(this, game, 32, 270);
 }
 
 Character.prototype = new Entity();
@@ -224,13 +318,12 @@ Character.prototype.update = function () {
         if (this.dead) {
             this.game.alive = false;
             this.game.reset();
+            console.log("reset");
             return;
         }
-        if (this.boundingbox.bottom < this.ground) {
-            // this.falling = true;
-        } 
-        if (this.game.space && !this.falling) {
+        if (this.game.w && !this.falling && !this.jumping) {
             this.jumping = true;
+            this.ground = this.y;            
         }
         if (this.jumping) {
             if (this.jumpAnimation.isDone()) {
@@ -238,33 +331,140 @@ Character.prototype.update = function () {
                 this.jumping = false;
                 Character.animation = cubeSlideBeginning;
             }
-            var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;
+            var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
             var totalHeight = 400;
-
             if (jumpDistance > 0.5) {
                 jumpDistance = 1 - jumpDistance;
             }  
-            height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));        
+            height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));  
+            this.lastBottom = this.boundingbox.bottom;      
             this.y = this.ground - height;
+
+            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+
+            for (let i = 0; i < this.game.platforms.length; i++){
+                let currentPlatform = this.game.platforms[i];
+                if (this.boundingbox.collide(currentPlatform.boundingbox) 
+                && this.lastBottom <= currentPlatform.boundingbox.top
+                && currentPlatform instanceof Platform) {
+                    console.log("shouldve jumped onto platform");
+                    this.jumping = false;
+                    this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentPlatform;
+                    this.jumpAnimation.elapsedTime = 0;
+                }  
+            }       
+            for (let i = 0; i < this.game.blocks.length; i++){
+                let currentBlock = this.game.blocks[i];
+                if (this.boundingbox.collide(currentBlock.boundingbox) 
+                && this.lastBottom <= currentBlock.boundingbox.top
+                && currentBlock instanceof Block) {
+                    console.log("shouldve jumped onto block");
+                    this.jumping = false;
+                    this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentBlock;
+                    this.jumpAnimation.elapsedTime = 0;
+                }  
+            }     
+            for (let i = 0; i < this.game.newPlatforms.length; i++){
+                let currentNewPlatform = this.game.newPlatforms[i];
+                if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
+                && this.lastBottom <= currentNewPlatform.boundingbox.top
+                && currentNewPlatform instanceof NewPlatform) {
+                    console.log("shouldve jumped onto new platform");
+                    this.jumping = false;
+                    this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentNewPlatform;
+                    this.jumpAnimation.elapsedTime = 0;
+                }  
+            }               
         }
         if (this.falling) {
-            this.y += this.game.clockTick / this.jumpAnimation.totalTime * 4 * this.jumpHeight;
-            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64)
-            if (this.boundingbox.bottom === this.ground || 
-            this.boundingbox.bottom === this.game.entities[4].boundingbox.top) {
-                this.falling = false;
+            console.log("falling");
+            this.lastBottom = this.boundingbox.bottom;
+            this.y += 15;
+            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+            
+            for (let i = 0; i < this.game.platforms.length; i++) {
+                let pf = this.game.platforms[i];
+                if (this.boundingbox.collide(pf.boundingbox) 
+                && this.lastBottom <= pf.boundingbox.top) {
+                    console.log("landed on another platform");
+                    this.falling = false;
+                    this.y = pf.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = pf;
+                }
+            }
+            for (let i = 0; i < this.game.blocks.length; i++) {
+                let blk = this.game.blocks[i];
+                if (this.boundingbox.collide(blk.boundingbox) 
+                && this.lastBottom <= blk.boundingbox.top) {
+                    console.log("landed on another platform");
+                    this.falling = false;
+                    this.y = blk.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = blk;
+                }
+            }
+            for (let i = 0; i < this.game.newPlatforms.length; i++) {
+                let npf = this.game.newPlatforms[i];
+                if (this.boundingbox.collide(npf.boundingbox) 
+                && this.lastBottom <= npf.boundingbox.top) {
+                    console.log("landed on another platform");
+                    this.falling = false;
+                    this.y = npf.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = npf;
+                }
+            }
+        }
+
+        if (!this.jumping && !this.falling) {
+            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+            if (this.boundingbox.left > this.platform.boundingbox.right) {
+                this.falling = true;
+                console.log("should fall");
             }
         }
         this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
       
-        if (this.boundingbox.climb(this.game.entities[4])) {
-            this.ground -= 64; 
-        } else if (this.boundingbox.collide(this.game.entities[3]) 
-        || this.boundingbox.collide(this.game.entities[4]) 
-        || this.boundingbox.collide(this.game.entities[5])) {
-            this.dead = true;  
-        }    
-        
+        for (let i = 0; i < this.game.platforms.length; i++) {
+            var pf = this.game.platforms[i];
+            if (this.boundingbox.collide(pf.boundingbox)) {
+                console.log("hit platform")
+                this.dead = true;
+            }
+        }
+
+        for (let i = 0; i < this.game.spikes.length; i++) {
+            let spk = this.game.spikes[i];
+            if (this.boundingbox.collide(spk.boundingbox)) {
+                console.log("hit spike")
+                this.dead = true;
+            }
+        }
+
+        for (let i = 0; i < this.game.blocks.length; i++) {
+            let blk = this.game.blocks[i];
+            if (this.boundingbox.collide(blk.boundingbox)) {
+                console.log("hit block")
+                this.dead = true;
+            }
+        }
+
+        for (let i = 0; i < this.game.newPlatforms.length; i++) {
+            let npf = this.game.newPlatforms[i];
+            if (this.boundingbox.collide(npf.boundingbox)) {
+                console.log("hit new pf")
+                this.dead = true;
+            }
+        }
+
+        for (let i = 0; i < this.game.walls.length; i++) {
+            let wl = this.game.walls[i];
+            if (this.boundingbox.collide(wl.boundingbox)) {
+                console.log("hit wall")
+                this.dead = true;
+            }
+        }       
     }
     Entity.prototype.update.call(this);
 }
@@ -273,137 +473,469 @@ Character.prototype.draw = function (ctx) {
     if (this.game.running) {
         if (this.dead) {
             return;
-        } else if (this.jumping) {
-            this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         } else {
-            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        } 
+            if (this.jumping) {
+                this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+            } else {
+                if (this.game.space) {
+                    this.animation = cubeLaser;
+                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                    this.l.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
+                } else {
+                    this.animation = cubeSlideBeginning;
+                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                }
+            }
+        }
+        
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
         ctx.lineWidth = 3;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+        ctx.strokeRect(this.l.x + 400, this.l.y - 20, this.l.width, this.l.height);
+        // this.boundingbox = new BoundingBox(x, y + 64, this.width, this.height);
         Entity.prototype.draw.call(this);
     }
 }
 Character.prototype.reset = function() {
     this.dead = false;
-    this.x = -64;
-}
-
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
-
-function Block(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.20, 2, true, false);
+    this.x = 32;
+    this.y = 270;
     this.ground = 350;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    // Entity.call(this, game, 600, 350);
-    Entity.call(this, game, -500, 350);
+    this.jumping = false;
+    this.falling = false;
 }
 
-Block.prototype = new Entity();
-Block.prototype.constructor = Block;
-
-Block.prototype.reset = function() {
-    // this.x = 600;
-    this.x = -500;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+function Laser(game, cube) {
+    laser = new Animation(ASSET_MANAGER.getAsset("./img/laser.png"), 0, 0, 64, 64, .2, 4, true, true);
+    this.animation = laser;
+    this.boundingbox = new BoundingBox(this.x, this.y + 64, this.width, this.height);
+    Entity.call(this, game, 0, 0);
 }
-Block.prototype.update = function () {
-    if (this.game.running) {
-        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    }  
+
+Laser.prototype = new Entity();
+Laser.prototype.constructor = Laser;
+
+Laser.prototype.update = function () {
     Entity.prototype.update.call(this);
 }
 
-Block.prototype.draw = function (ctx) {
-    if (this.game.running) {
-        if (this.x >= -64) {         
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);     
-        ctx.lineWidth = 5;
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-        Entity.prototype.draw.call(this);
-        }
-    }
+Laser.prototype.draw = function (ctx) {
 }
 
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Spike(game) {
+function Credits(game) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/credits.png"), 0, 0, 800, 500, .2, 0, true, false);
+    this.ground = 400;
+    Entity.call(this, game, 100, 100);
+}
+
+Credits.prototype = new Entity();
+Credits.prototype.constructor = Credits;
+
+Credits.prototype.update = function() {
+    Entity.prototype.update.call(this);
+}
+
+Credits.prototype.draw = function(ctx) {
+    if(this.game.credits && !this.game.runnning) {
+        this.animation.drawFrame(this.game.clockTick, ctx, 0, 0, 0);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+/*function SloMo(game, x, y, gnd) {
+    this.ground = gnd;
+    this.x = x;
+    this.y = y;
+    this.boundingbox = new BoundingBox(this.x);
+    Entity.call(this, game, 200, 100);
+}
+
+SloMo.prototype = new Entity();
+SloMo.prototype.constructor = SlowMo;
+
+SloMo.prototype.update = function() {
+
+}
+
+SloMo.prototype.draw = function() {
+
+}
+
+
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+function Platform(game, x, y, width, height, color) {
+    this.width = width;
+    this.height = height;
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(x + 64, y + 64, this.width, this.height);
+    this.color = color;
+    Entity.call(this, game, x, y);
+}
+
+Platform.prototype = new Entity();
+
+Platform.prototype.constructor = Platform;
+
+Platform.prototype.reset = function () {
+    this.x = this.startX;
+    this.y = this.startY;
+}
+
+Platform.prototype.update = function () {
+    if (!this.game.running) {
+        return;
+    }
+    this.x -= 200 * this.game.clockTick;
+    this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
+    Entity.prototype.update.call(this);
+}
+
+Platform.prototype.draw = function (ctx) {
+    // this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.width, this.height);
+}
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+function Spike(game, x, y) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
-    this.ground = 350;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    // Entity.call(this, game, 400, 350);
-    Entity.call(this, game, -500, 350);
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
+    Entity.call(this, game, x , y);
 }
 
 Spike.prototype = new Entity();
 Spike.prototype.constructor = Spike;
 
+
 Spike.prototype.reset = function() {
-    // this.x = 400;
-    this.x = -500;
+    this.x = this.startX;
+    this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
 Spike.prototype.update = function () {
-    if (this.game.running) {
-        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+    if (!this.game.running) {
+        return;    
     }
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+    this.x -= 200 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 Spike.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if (this.x >= -64) {
-            this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = "blue";
-            ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-            Entity.prototype.draw.call(this);
-        }
-    }  
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+    }
+    Entity.prototype.draw.call(this);
 }
 
-function Wall(game) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.20, 2, true, false);
-    this.ground = 350;
+function Block(game, x, y) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.5, 2, true, false);
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
+    Entity.call(this, game, x , y);
+}
+
+Block.prototype = new Entity();
+Block.prototype.constructor = Block;
+
+
+Block.prototype.reset = function() {
+    this.x = this.startX;
+    this.y = this.startY;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+}
+
+Block.prototype.update = function () {
+    if (!this.game.running) {
+        return;    
+    }
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+    this.x -= 200 * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+Block.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+function NewPlatform(game, x, y) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/platform.png"), 0, 0, 320, 64, 0.5, 2, true, false);
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(this.x + 314, this.y, 330, 64);
+    Entity.call(this, game, x , y);
+}
+
+NewPlatform.prototype = new Entity();
+NewPlatform.prototype.constructor = NewPlatform;
+
+
+NewPlatform.prototype.reset = function() {
+    this.x = this.startX;
+    this.y = this.startY;
+    this.boundingbox = new BoundingBox(this.x + 314, this.y + 64, 330, 64);
+}
+
+NewPlatform.prototype.update = function () {
+    if (!this.game.running) {
+        return;    
+    }
+    this.boundingbox = new BoundingBox(this.x + 314, this.y + 64, 330, 64);
+    this.x -= 200 * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+NewPlatform.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 1;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 314, this.y + 64, 330, 64);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+function Wall(game, x, y) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
+    this.startX = x;
+    this.startY = y;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
-    Entity.call(this, game, 1000, 296);
+    Entity.call(this, game, x , y);
 }
 
 Wall.prototype = new Entity();
 Wall.prototype.constructor = Wall;
 
+
 Wall.prototype.reset = function() {
-    this.x = 1000;
+    this.x = this.startX;
+    this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
 }
+
 Wall.prototype.update = function () {
-    if (this.game.running) {
-        this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
-    }  
+    if (!this.game.running) {
+        return;    
+    }
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+    this.x -= 200 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 Wall.prototype.draw = function (ctx) {
     if (this.game.running) {
-        if (this.x >= -64) {
-            this.animation.drawFrame(this.game.clockTick, ctx, this.x -= 8, this.y, 3);     
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = "blue";
-            ctx.strokeRect(this.x + 64, this.y, 64, 192);
-            Entity.prototype.draw.call(this);
-        }             
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
+    Entity.prototype.draw.call(this);
 }
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
 
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
+function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
+
+    // let spike;
+    // let block;
+    // let wall;
+    // let newPlatform;
+    let start;
+    let currentPlatform
+    let w;
+
+    // w = new Wall(gameEngine, 1650,250);
+    // gameEngine.addEntity(w);
+    // walls.push(w);
+
+    //UP STAIRS
+    // pf = new Platform(gameEngine, 800, 325, 50, 50, "grey");
+    // gameEngine.addEntity(pf);
+    // platforms.push(pf);
+    // pf = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
+    // gameEngine.addEntity(pf);
+    // platforms.push(pf);
+    // pf = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
+    // gameEngine.addEntity(pf);
+    // platforms.push(pf);
+    // pf = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
+    // gameEngine.addEntity(pf);
+    // platforms.push(pf);
+
+    blk = new Block(gameEngine, 800, 275);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 1000, 250);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 1200, 225);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 1400, 200);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    /*
+    *Spikes in tunnel
+    */
+   for (var i = 0; i < 4; i++) { 
+       spike = new Spike(gameEngine, 1564 + 64 * i, 0);
+       gameEngine.addEntity(spike);
+       spikes.push(spike);
+   }
+
+   blk = new Block(gameEngine, 1938, 72);
+   gameEngine.addEntity(blk);
+   blocks.push(blk);
+   blk = new Block(gameEngine, 2138, 0);
+   gameEngine.addEntity(blk);
+   blocks.push(blk);
+
+   spk = new Spike(gameEngine, 1938, 136);
+   gameEngine.addEntity(spk);
+   spikes.push(spk);
+
+   wl = new Wall(gameEngine, 2138, 128);
+   gameEngine.addEntity(wl);
+   walls.push(wl);
+   wl = new Wall(gameEngine, 2138, 308);
+   gameEngine.addEntity(wl);
+   walls.push(wl);
+
+   
+    //Tunnel
+    npf = new NewPlatform(gameEngine, 1300, 200);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1630, 200);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+    platforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1960, 200);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+    // currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
+    // gameEngine.addEntity(currentPlatform);
+    // platforms.push(currentPlatform);
+
+    /*
+    *Spike under stairs
+    */
+
+   for (var i = 0; i < 24; i++) {   
+       spike = new Spike(gameEngine, 2636 + 64 * i, 300);
+       gameEngine.addEntity(spike);
+       spikes.push(spike);
+   }
+    //DOWNSTAIRS
+    // currentBlock = new Block(gameEngine, 2450, 200);
+    // gameEngine.addEntity(currentBlock);
+    // blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 2650, 200);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 2800, 120);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3000, 195);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3200, 180);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3400, 255);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+
+    // spike = new Spike(gameEngine, 2700 , -200 , true);
+    // gameEngine.addEntity(spike);
+    // spikes.push(spike);
+    // spike = new Spike(gameEngine, 2900 , -200 , true);
+    // gameEngine.addEntity(spike);
+    // spikes.push(spike);
+    // spike = new Spike(gameEngine, 3100 , -200 , true);
+    // gameEngine.addEntity(spike);
+    // spikes.push(spike);
+
+    //UPSTAIRS
+
+    blk = new Block(gameEngine, 3600, 190);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 3800, 165);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4000, 140);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4200, 165);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+
+    for (let i = 0; i < 4; i++) {
+        spike = new Spike(gameEngine, 4300, 150 + 50 * i);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+
+    //TUNNEL
+    blk = new Block(gameEngine, 4400, 190);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4500, 40);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    // w = new Wall(gameEngine, 5000,-100);
+    // gameEngine.addEntity(w);
+    // walls.push(w);
+
+
+    // w = new Wall(gameEngine, 5000,300);
+    // gameEngine.addEntity(w);
+    // walls.push(w);
+
+    
+
+    //GROUND
+    currentPlatform = new Platform(gameEngine, 0, 400, 1000000000000000, 100, "black");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);    
+
+
+}
 
 // the "main" code begins here
 
@@ -411,11 +943,16 @@ var ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("./img/cube_slide.png");
 ASSET_MANAGER.queueDownload("./img/cube_jump.png");
-ASSET_MANAGER.queueDownload("./img/block.png");
-ASSET_MANAGER.queueDownload("./img/spike.png");
-ASSET_MANAGER.queueDownload("./img/wall.png");
+ASSET_MANAGER.queueDownload("./img/cube_right_laser.png");
+ASSET_MANAGER.queueDownload("./img/laser.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
+ASSET_MANAGER.queueDownload("./img/block.png");
+ASSET_MANAGER.queueDownload("./img/platform.png");
+ASSET_MANAGER.queueDownload("./img/wall.png");
+ASSET_MANAGER.queueDownload("./img/spike.png");
+ASSET_MANAGER.queueDownload("./img/credits.png");
+
 
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
@@ -424,21 +961,40 @@ ASSET_MANAGER.downloadAll(function () {
     var ctx = canvas.getContext('2d');
 
     var gameEngine = new GameEngine();
+
+    var platforms = [];
+    gameEngine.platforms = platforms;
+
+    var spikes = [];
+    gameEngine.spikes = spikes;
  
+    var blocks = [];
+    gameEngine.blocks = blocks;
+
+    var newPlatforms = [];
+    gameEngine.newPlatforms = newPlatforms;
+
+    var walls = [];
+    gameEngine.walls = walls;
+
     gameEngine.init(ctx);
     gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
-    gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
+    //gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
+    
+
+    createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine);
+
+
     gameEngine.addEntity(new Character(gameEngine)); 
-    gameEngine.addEntity(new Spike(gameEngine));
-    gameEngine.addEntity(new Block(gameEngine));
-    gameEngine.addEntity(new Wall(gameEngine));
-    gameEngine.running = false;
+    // gameEngine.addEntity(new Laser(gameEngine)); 
+    gameEngine.addEntity(new Credits(gameEngine));
+ //   gameEngine.addEntity(new HandleClicks(gameEngine));
+ //   gameEngine.addEntity(new HighlightSelection(gameEngine));
+ //   gameEngine.mainmenu = true;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
-    // setTimeout(function() {
-    ReadString("----O-----X----I", 500);
 });
 
