@@ -827,7 +827,7 @@ function createMap(platforms, spikes, gameEngine){
     *Spikes in tunnel
     */
 
-   start = 1650;
+   start = 1590;
 
    for(var i = 0; i < 12; i++){
        
@@ -997,6 +997,7 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Spike(gameEngine));
+
     gameEngine.addEntity(new Credits(gameEngine));
  //   gameEngine.addEntity(new HandleClicks(gameEngine));
  //   gameEngine.addEntity(new HighlightSelection(gameEngine));
