@@ -1,3 +1,42 @@
+var menuSelectSound = new Audio("MeleeMenuSelect Sound.mp3");
+var gameBackgroundSound = new Audio("gameMusic.mp3");
+
+menuSelectSound.volume = .6;
+playSound = function() {
+    menuSelectSound.play();
+
+}
+
+volumeSelect = function(selectedVolume) {
+
+    if(selectedVolume == "0.0") {
+        menuSelectSound.volume = 0;
+        menuBackgroundSound.volume = 0;
+        gameBackgroundSound.volume = 0;
+    } else if(selectedVolume == "0.2") {
+        menuSelectSound.volume = 0.2;
+        menuBackgroundSound.volume = 0.2;
+        gameBackgroundSound.volume = 0.2;
+    } else if(selectedVolume == "0.4") {
+        menuSelectSound.volume = 0.4;
+        menuBackgroundSound.volume = 0.4;
+        gameBackgroundSound.volume = 0.4;
+    } else if(selectedVolume == "0.6") {
+        menuSelectSound.volume = 0.6;
+        menuBackgroundSound.volume = 0.6;
+        gameBackgroundSound.volume = 0.6;
+    } else if(selectedVolume == "0.8") {
+        menuSelectSound.volume = 0.8;
+        menuBackgroundSound.volume = 0.8;
+        gameBackgroundSound.volume = 0.8;
+    } else if(selectedVolume == "1.0") {
+        menuSelectSound.volume = 1.0;
+        menuBackgroundSound.volume = 1.0;
+        gameBackgroundSound.volume = 1.0;
+    }
+
+}
+
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -143,19 +182,24 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
     if(game.click != null && game.click.x >= startX &&
         game.click.x <= endX && game.click.y >= startY &&
         game.click.y <= endY) {
+            playSound();
+            game.song.play();
             game.inmenus = true;
             if(func == "single"){
+                game.canbepaused = true;
+                game.song.pause();
                 game.inmenus = false;
                 game.running = true;
+                game.song = gameBackgroundSound;
                 game.actualTime.gameTime = 0;
             } else if(func == "multi") {
-                game.inmenus = false;
+                //game.inmenus = false;
                 game.actualTime.gameTime = 0;
                 game.multi = true;
-                game.mainmenu = false;
+                //game.mainmenu = false;
             } else if(func == "naked") {
                 game.naked = true; 
-                game.mainmenu = false;
+                //game.mainmenu = false;
             } else if(func == "controls") {
                 game.controls = true;
                 game.mainmenu = false;
@@ -164,6 +208,8 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.mainmenu = false;
             } else if(func == "credits back") {
                 game.credits = false;
+                game.controls = false;
+                game.leaderboard = false;
                 game.mainmenu = true; 
             } else if(func == "dead") {
                 game.endscreen = true; 
@@ -171,8 +217,10 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.leaderboard = true; 
                 game.mainmenu = false;
             } else if(func == "end game main menu") {
+                game.song.pause();
                 game.alive = true;
                 game.mainmenu = true;
+                game.song = menuBackgroundSound;
             }
         }
 }
@@ -227,7 +275,7 @@ ReturnToMainMenu = function(ctx, game) {
 
 function HandleMainMenuClicks(ctx, game) {
     HandleClicks(game, 300, 519, 115, 151, "single");
-    HandleClicks(game, 310, 196, 170, 204, "multi");
+    HandleClicks(game, 310, 508, 170, 204, "multi");
     HandleClicks(game, 350, 454, 220, 251, "naked");
     HandleClicks(game, 330, 471, 273, 304, "controls");
     HandleClicks(game, 340, 461, 371, 405, "credits");
@@ -242,6 +290,142 @@ function HandleMainMenuClicks(ctx, game) {
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
+
+function FillVolume(num, vol, ctx) {
+    if(vol == "true") {
+        ctx.fillText("Volume", 10, 480);
+    }
+    if(num == 1) {
+        ctx.fillText("l", 145, 480); 
+    }
+    if(num == 2) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+    }
+    if(num == 3) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+    }
+    if(num == 4) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+        ctx.fillText("l", 175, 480);
+    }
+    if(num == 5) {
+        ctx.fillText("l", 145, 480); 
+        ctx.fillText("l", 155, 480);
+        ctx.fillText("l", 165, 480);
+        ctx.fillText("l", 175, 480);
+        ctx.fillText("l", 185, 480);
+    }
+
+}
+
+function DisplayVolume(ctx, game, ctx) {
+    ctx.fillStyle = "yellow"; 
+    FillVolume(5, "true", ctx);
+    if(game.volume == 0) {
+        ctx.fillStyle = "yellow"; 
+        FillVolume(5, "", ctx);
+    } else if(game.volume == 1) {
+        ctx.fillStyle = "white";
+        FillVolume(1, "", ctx);
+    } else if(game.volume == 2) {
+        ctx.fillStyle = "white";
+        FillVolume(2, "", ctx);
+    } else if(game.volume == 3) {
+        ctx.fillStyle = "white";
+        FillVolume(3, "", ctx);
+    } else if(game.volume == 4) {
+        ctx.fillStyle = "white";
+        FillVolume(4, "", ctx);
+    } else if(game.volume == 5) {
+        ctx.fillStyle = "white";
+        FillVolume(5, "", ctx);
+    } else if(game.volume == 6) {
+        ctx.fillStyle = "white";
+        FillVolume(3, "", ctx);
+
+    }
+    HandleVolumeSelection(ctx, game, 11, 136, 441, 471, "0.0");
+    HandleVolumeSelection(ctx, game, 148, 156, 441, 471, "0.2");
+    HandleVolumeSelection(ctx, game, 158, 166, 441, 471, "0.4");
+    HandleVolumeSelection(ctx, game, 168, 176, 441, 471, "0.6");
+    HandleVolumeSelection(ctx, game, 178, 186, 441, 471, "0.8");
+    HandleVolumeSelection(ctx, game, 188, 196, 441, 471, "1.0");
+    HighlightVolumeSelection(ctx, game, 11, 136, 441, 471, "0.0");
+    HighlightVolumeSelection(ctx, game, 148, 156, 441, 471, "0.2");
+    HighlightVolumeSelection(ctx, game, 158, 166, 441, 471, "0.4");
+    HighlightVolumeSelection(ctx, game, 168, 176, 441, 471, "0.6");
+    HighlightVolumeSelection(ctx, game, 178, 186, 441, 471, "0.8");
+    HighlightVolumeSelection(ctx, game, 188, 196, 441, 471, "1.0");
+}
+
+function HandleVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
+    if (game.click != null && game.click.x >= startX &&
+        game.click.x <= endX && game.click.y >= startY &&
+        game.click.y <= endY) {
+            volumeSelect(func);
+            if(func == "0.0") {
+                ctx.fillStyle = "yellow"; 
+                game.volume = 0;
+            } else if(func == "0.2") {
+                game.volume = 1;
+            } else if(func == "0.4") {
+                game.volume = 2;
+            } else if(func == "0.6") {
+                game.volume = 3;
+            } else if(func == "0.8") {
+                game.volume = 4;
+            } else if(func == "1.0") {
+                game.volume = 5;
+            }
+            menuSelectSound.play();
+        }
+}
+
+function HighlightVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
+    if(game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
+        game.mouse.y >= startY && game.mouse.y <= endY) {
+            ctx.fillStyle = "white";
+            if(func == "0.0") {
+                FillVolume(6, "true", ctx);
+                ctx.fillStyle = "yellow";
+                FillVolume(5, "", ctx);
+            } else if(func == "0.2") {
+                FillVolume(1, "", ctx);
+
+            } else if(func == "0.4") {
+                FillVolume(2, "", ctx);
+                
+            } else if(func == "0.6") {
+                FillVolume(3, "", ctx);
+                
+            } else if(func == "0.8") {
+                FillVolume(4, "", ctx);
+                
+            } else if(func == "1.0") {
+                FillVolume(5, "", ctx);
+                
+            }
+        }
+}
+
+function displayControls(ctx) {
+    ctx.fillText("Spacebar:  Jump", 250, 100);
+    ctx.fillText("P : pause", 300, 150);
+    ctx.fillText("Select bars to adjust Volume", 150, 200);
+    ctx.fillText("Select Volume to mute", 200, 250);
+    ctx.fillText("Avoid Spikes", 280, 300);
+    ctx.fillText("Get to the end", 275, 350);
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
 
 function PlayGame(game, x, y) {
     Entity.call(this, game, x, y);
@@ -258,11 +442,14 @@ PlayGame.prototype.update = function () {
 }
 
 PlayGame.prototype.draw = function (ctx) {
+    this.game.song.pause();
+    ctx.font = "30pt Impact";
+    ctx.fillStyle = "yellow";
+    DisplayVolume(ctx, this.game, ctx, this.game.volume);
+    this.game.song.play();
     if (!this.game.running) {
-        ctx.font = "30pt Impact";
+        
         ctx.fillStyle = "yellow";
-        
-        
         if(!this.game.alive) {
             this.game.canbepaused = false;
             ctx.fillText("Game Over", 315, 200);
@@ -288,6 +475,8 @@ PlayGame.prototype.draw = function (ctx) {
             HandleMainMenuClicks(ctx, this.game);
             
         } else if (this.game.controls) {
+            displayControls(ctx);
+            console.log("here");
             ReturnToMainMenu(ctx, this.game);
         } else if(this.game.naked) {
             ReturnToMainMenu(ctx, this.game);
@@ -517,7 +706,6 @@ SloMo.prototype.draw = function() {
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
-}
 
 function Platform(game, x, y, width, height, color) {
     this.width = width;
@@ -527,6 +715,7 @@ function Platform(game, x, y, width, height, color) {
     this.boundingbox = new BoundingBox(x, y, width, height);
     this.color = color;
     Entity.call(this, game, x, y);
+}
 
 Platform.prototype = new Entity();
 
@@ -808,7 +997,6 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Spike(gameEngine));
-    gameEngine.addEntity(new Block(gameEngine));
     gameEngine.addEntity(new Credits(gameEngine));
  //   gameEngine.addEntity(new HandleClicks(gameEngine));
  //   gameEngine.addEntity(new HighlightSelection(gameEngine));
