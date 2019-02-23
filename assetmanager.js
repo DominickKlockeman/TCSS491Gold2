@@ -22,7 +22,7 @@ AssetManager.prototype.downloadAll = function (callback) {
         var path = this.downloadQueue[i];
         console.log(path);
 
-        img.addEventListener("load", function () {
+        img. EventListener("load", function () {
             console.log("Loaded " + this.src);
             that.successCount++;
             if(that.isDone()) callback();
