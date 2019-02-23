@@ -139,6 +139,12 @@ GameEngine.prototype.startInput = function () {
             that.ispaused = !that.ispaused;
             that.song.pause();
         }
+        if (String.fromCharCode(e.which) === 'W') that.w = true;
+        e.preventDefault();
+    }, false);
+
+    this.ctx.canvas.addEventListener("keyup", function (e) {
+        if (String.fromCharCode(e.which) === ' ') that.space = false;
         e.preventDefault();
     }, false);
 
@@ -202,9 +208,10 @@ GameEngine.prototype.loop = function () {
         this.clockTick = this.timer.tick();
         this.draw();
     }
-        this.space = null;
-        this.click = null;
-        this.wheel = null;
+    this.w = null;
+    this.click = null;
+    this.wheel = null;
+    this.space = null;
     // this.draw();
     // this.space = null;
     // this.click = null;
