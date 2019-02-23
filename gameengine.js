@@ -76,7 +76,7 @@ function GameEngine() {
     this.running = false;
     this.inmenus = true;
     this.ispaused = false;
-    this.volume = 6;
+    this.volume = 3;
     this.song = menuBackgroundSound;
 }
 

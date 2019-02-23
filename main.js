@@ -344,23 +344,21 @@ function DisplayVolume(ctx, game, ctx) {
     } else if(game.volume == 5) {
         ctx.fillStyle = "white";
         FillVolume(5, "", ctx);
-    } else if(game.volume == 6) {
-        ctx.fillStyle = "white";
-        FillVolume(3, "", ctx);
+    } 
 
-    }
-    HandleVolumeSelection(ctx, game, 11, 136, 441, 471, "0.0");
-    HandleVolumeSelection(ctx, game, 148, 156, 441, 471, "0.2");
-    HandleVolumeSelection(ctx, game, 158, 166, 441, 471, "0.4");
-    HandleVolumeSelection(ctx, game, 168, 176, 441, 471, "0.6");
-    HandleVolumeSelection(ctx, game, 178, 186, 441, 471, "0.8");
-    HandleVolumeSelection(ctx, game, 188, 196, 441, 471, "1.0");
-    HighlightVolumeSelection(ctx, game, 11, 136, 441, 471, "0.0");
-    HighlightVolumeSelection(ctx, game, 148, 156, 441, 471, "0.2");
-    HighlightVolumeSelection(ctx, game, 158, 166, 441, 471, "0.4");
-    HighlightVolumeSelection(ctx, game, 168, 176, 441, 471, "0.6");
-    HighlightVolumeSelection(ctx, game, 178, 186, 441, 471, "0.8");
-    HighlightVolumeSelection(ctx, game, 188, 196, 441, 471, "1.0");
+
+    HandleVolumeSelection(ctx, game, 11, 136, 453, 483, "0.0");
+    HandleVolumeSelection(ctx, game, 148, 158, 453, 483, "0.2");
+    HandleVolumeSelection(ctx, game, 158, 168, 453, 483, "0.4");
+    HandleVolumeSelection(ctx, game, 168, 178, 453, 483, "0.6");
+    HandleVolumeSelection(ctx, game, 178, 188, 453, 483, "0.8");
+    HandleVolumeSelection(ctx, game, 188, 198, 453, 483, "1.0");
+    HighlightVolumeSelection(ctx, game, 11, 136, 453, 483, "0.0");
+    HighlightVolumeSelection(ctx, game, 148, 158, 453, 483, "0.2");
+    HighlightVolumeSelection(ctx, game, 158, 168, 453, 483, "0.4");
+    HighlightVolumeSelection(ctx, game, 168, 178, 453, 483, "0.6");
+    HighlightVolumeSelection(ctx, game, 178, 188, 453, 483, "0.8");
+    HighlightVolumeSelection(ctx, game, 188, 198, 453, 483, "1.0");
 }
 
 function HandleVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
@@ -390,23 +388,29 @@ function HighlightVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
     if(game.mouse != null && game.mouse.x >= startX && game.mouse.x <= endX && 
         game.mouse.y >= startY && game.mouse.y <= endY) {
             ctx.fillStyle = "white";
+            ctx.fillStyle = "yellow";
+            FillVolume(5, "", ctx);
             if(func == "0.0") {
-                FillVolume(6, "true", ctx);
-                ctx.fillStyle = "yellow";
-                FillVolume(5, "", ctx);
+                //ctx.fillStyle = "yellow";
+                //FillVolume(5, "", ctx);
             } else if(func == "0.2") {
+                ctx.fillStyle = "white";
                 FillVolume(1, "", ctx);
 
             } else if(func == "0.4") {
+                ctx.fillStyle = "white";
                 FillVolume(2, "", ctx);
                 
             } else if(func == "0.6") {
+                ctx.fillStyle = "white";
                 FillVolume(3, "", ctx);
                 
             } else if(func == "0.8") {
+                ctx.fillStyle = "white";
                 FillVolume(4, "", ctx);
                 
             } else if(func == "1.0") {
+                ctx.fillStyle = "white";
                 FillVolume(5, "", ctx);
                 
             }
