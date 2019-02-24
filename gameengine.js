@@ -78,6 +78,7 @@ function GameEngine() {
     this.ispaused = false;
     this.volume = 3;
     this.song = menuBackgroundSound;
+    this.playerFinished;
 }
 
 GameEngine.prototype.init = function (ctx) {
