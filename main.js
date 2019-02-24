@@ -170,6 +170,64 @@ BoundingBox.prototype.collide = function (other) {
     }
     return false;
 }
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+function RocketShip(game, x, y) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/rocketship.png"), 0, 0, 100, 105, 0.2, 0, true, false);
+    this.startX = x;
+    this.startY = y;
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 10000);
+    Entity.call(this, game, x , y);
+}
+
+RocketShip.prototype = new Entity();
+RocketShip.prototype.constructor = RocketShip;
+
+RocketShip.prototype.update = function() {
+    if(!this.game.running) {
+        return;
+    }
+    Entity.prototype.update.call(this);
+}
+
+RocketShip.prototype.draw = function() {
+    if(this.game.running) {
+        //this.animation.drawFrame(this.game.clockTick, ctx, this,x, this.y, 0);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+
+/*
+
+Spike.prototype.update = function () {
+    if (!this.game.running) {
+        return;    
+    }
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+    this.x -= 200 * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+Spike.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+
+
+
+*/
+
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -416,12 +474,12 @@ function HighlightVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
 }
 
 function displayControls(ctx) {
-    ctx.fillText("Spacebar:  Jump", 250, 100);
+    ctx.fillText("W:  Jump", 300, 100);
     ctx.fillText("P : pause", 300, 150);
     ctx.fillText("Select bars to adjust Volume", 150, 200);
     ctx.fillText("Select Volume to mute", 200, 250);
     ctx.fillText("Avoid Spikes", 280, 300);
-    ctx.fillText("Get to the end", 275, 350);
+    ctx.fillText("Get to your spaceship", 200, 350);
 }
 
 function endGame(ctx, game) {
@@ -552,6 +610,7 @@ Character.prototype.update = function () {
             this.y = this.ground - height;
 
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+
 
             for (let i = 0; i < this.game.platforms.length; i++){
                 let currentPlatform = this.game.platforms[i];
@@ -737,14 +796,14 @@ Character.prototype.draw = function (ctx) {
             if (this.jumping) {
                 this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
             } else {
-                if (this.game.space) {
-                    this.animation = cubeLaser;
-                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                    this.l.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
-                } else {
+                //if (this.game.space) {
+                    //this.animation = cubeLaser;
+                    //this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                    //this.l.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
+                //} else {
                     this.animation = cubeSlideBeginning;
                     this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                }
+                //}
             }
         }
         
@@ -1477,6 +1536,7 @@ ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
 ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
+ASSET_MANAGER.queueDownload("./img/rocketship.png");
 
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
@@ -1503,6 +1563,8 @@ ASSET_MANAGER.downloadAll(function () {
 
     var powerups = [];
     gameEngine.powerups = powerups;
+
+    gameEngine.addEntity(new RocketShip(gameEngine, 8500, -100));
 
     gameEngine.init(ctx);
     gameEngine.start();
