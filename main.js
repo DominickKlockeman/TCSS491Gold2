@@ -535,7 +535,7 @@ Character.prototype.update = function () {
 
             }
             var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
-            var totalHeight = 400;
+            var totalHeight = 300;
             if (jumpDistance > 0.5) {
                 jumpDistance = 1 - jumpDistance;
             }  
@@ -803,7 +803,7 @@ Platform.prototype.update = function () {
     if (!this.game.running) {
         return;
     }
-    this.x -= 200 * this.game.clockTick;
+    this.x -= 250 * this.game.clockTick;
     this.boundingbox = new BoundingBox(this.x, this.y, this.width, this.height);
     Entity.prototype.update.call(this);
 }
@@ -840,7 +840,7 @@ Spike.prototype.update = function () {
         return;    
     }
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    this.x -= 200 * this.game.clockTick;
+    this.x -= 300 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
@@ -877,7 +877,7 @@ Block.prototype.update = function () {
         return;    
     }
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    this.x -= 200 * this.game.clockTick;
+    this.x -= 300 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
@@ -914,7 +914,7 @@ NewPlatform.prototype.update = function () {
         return;    
     }
     this.boundingbox = new BoundingBox(this.x + 314, this.y + 64, 330, 64);
-    this.x -= 200 * this.game.clockTick;
+    this.x -= 300 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
@@ -951,7 +951,7 @@ Wall.prototype.update = function () {
         return;    
     }
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
-    this.x -= 200 * this.game.clockTick;
+    this.x -= 300 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
@@ -1014,7 +1014,7 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     *Spikes in tunnel
     */
    for (var i = 0; i < 4; i++) { 
-       spike = new Spike(gameEngine, 1564 + 64 * i, 0);
+       spike = new Spike(gameEngine, 1564 + 64 * i, -50);
        gameEngine.addEntity(spike);
        spikes.push(spike);
    }
@@ -1049,6 +1049,7 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     npf = new NewPlatform(gameEngine, 1960, 200);
     gameEngine.addEntity(npf);
     platforms.push(npf);
+
     // currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
     // gameEngine.addEntity(currentPlatform);
     // platforms.push(currentPlatform);
@@ -1146,13 +1147,15 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     blk = new Block(gameEngine, 4000, 140);
     gameEngine.addEntity(blk);
     blocks.push(blk);
+
+    
     blk = new Block(gameEngine, 4200, 165);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
 
     for (let i = 0; i < 4; i++) {
-        spike = new Spike(gameEngine, 4300, 150 + 50 * i);
+        spike = new Spike(gameEngine, 4300, 200 + 50 * i);
         gameEngine.addEntity(spike);
         spikes.push(spike);
     }
@@ -1161,9 +1164,57 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     blk = new Block(gameEngine, 4400, 190);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 4500, 40);
+    blk = new Block(gameEngine, 4500, 100);
     gameEngine.addEntity(blk);
     blocks.push(blk);
+
+
+    npf = new NewPlatform(gameEngine, 4450, 100);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+
+    npf = new NewPlatform(gameEngine, 4300, 250);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+    npf = new NewPlatform(gameEngine, 4630, 250);
+    gameEngine.addEntity(npf);
+    platforms.push(npf);
+
+    spike = new Spike(gameEngine, 4970, 40);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 4970, -24);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 4970, -84);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5150, 190);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    for(let i = 0; i < 10; i++){
+
+
+    blk = new Block(gameEngine, 5210 + 192 * i, 250);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5275  + 192 * i, 250);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    spike = new Spike(gameEngine, 5340 + 192 * i, 250);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+
+
+    }
+
+
+
+
+
+
   
   /*
    start = 2375;
@@ -1285,6 +1336,7 @@ ASSET_MANAGER.queueDownload("./img/platform.png");
 ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
+ASSET_MANAGER.queueDownload("./powerup_boost.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
