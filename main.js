@@ -506,6 +506,7 @@ function Character(game) {
     this.height = 0;
     game.alive = !this.dead;
     this.ground = 350;
+    this.isPowerUp = false;
     this.platform = game.platforms[0];
     console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
@@ -618,55 +619,105 @@ Character.prototype.update = function () {
                     this.platform = npf;
                 }
             }
+
+            if(this.isPowerUp){
+
+
+            }
+
+
+
+
+
+
         }
 
-        if (!this.jumping && !this.falling) {
+        
+
+
+            if (!this.jumping && !this.falling) {
+                this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+                if (this.boundingbox.left > this.platform.boundingbox.right) {
+                    this.falling = true;
+                    console.log("should fall");
+                }
+            }
+
+
+
+            
+        if(!this.isPowerUp){
+
+
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-            if (this.boundingbox.left > this.platform.boundingbox.right) {
-                this.falling = true;
-                console.log("should fall");
+          
+            for (let i = 0; i < this.game.platforms.length; i++) {
+                var pf = this.game.platforms[i];
+                if (this.boundingbox.collide(pf.boundingbox)) {
+                    this.dead = true;
+                }
             }
-        }
-        this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-      
-        for (let i = 0; i < this.game.platforms.length; i++) {
-            var pf = this.game.platforms[i];
-            if (this.boundingbox.collide(pf.boundingbox)) {
-                this.dead = true;
+    
+            for (let i = 0; i < this.game.spikes.length; i++) {
+                let spk = this.game.spikes[i];
+                if (this.boundingbox.collide(spk.boundingbox)) {
+                    console.log("hit spike")
+                    this.dead = true;
+                }
             }
+    
+            for (let i = 0; i < this.game.blocks.length; i++) {
+                let blk = this.game.blocks[i];
+                if (this.boundingbox.collide(blk.boundingbox)) {
+                    console.log("hit block")
+                    this.dead = true;
+                }
+            }
+    
+            for (let i = 0; i < this.game.newPlatforms.length; i++) {
+                let npf = this.game.newPlatforms[i];
+                if (this.boundingbox.collide(npf.boundingbox)) {
+                    console.log("hit new pf")
+                    this.dead = true;
+                }
+            }
+    
+            for (let i = 0; i < this.game.walls.length; i++) {
+                let wl = this.game.walls[i];
+                if (this.boundingbox.collide(wl.boundingbox)) {
+                    console.log("hit wall")
+                    this.dead = true;
+                }
+            }       
+    
         }
+    
+    
+            for (let i = 0; i < this.game.powerups.length; i++) {
+                let wl = this.game.powerups[i];
+                if (this.boundingbox.collide(wl.boundingbox)) {
+                    
+                    //console.log("coin hit");
+                    this.isPowerUp = true;
+                    
+                }
+            }       
 
-        for (let i = 0; i < this.game.spikes.length; i++) {
-            let spk = this.game.spikes[i];
-            if (this.boundingbox.collide(spk.boundingbox)) {
-                console.log("hit spike")
-                this.dead = true;
-            }
-        }
+            if(this.isPowerUp){
+                console.log("POWER UP");
 
-        for (let i = 0; i < this.game.blocks.length; i++) {
-            let blk = this.game.blocks[i];
-            if (this.boundingbox.collide(blk.boundingbox)) {
-                console.log("hit block")
-                this.dead = true;
-            }
-        }
+                setTimeout(function() {
 
-        for (let i = 0; i < this.game.newPlatforms.length; i++) {
-            let npf = this.game.newPlatforms[i];
-            if (this.boundingbox.collide(npf.boundingbox)) {
-                console.log("hit new pf")
-                this.dead = true;
-            }
-        }
+                    this.isPowerUp = false;
+                    
 
-        for (let i = 0; i < this.game.walls.length; i++) {
-            let wl = this.game.walls[i];
-            if (this.boundingbox.collide(wl.boundingbox)) {
-                console.log("hit wall")
-                this.dead = true;
+                  }, 3000)
+
+
             }
-        }       
+                
+
+    
     }
     Entity.prototype.update.call(this);
 }
@@ -927,6 +978,48 @@ NewPlatform.prototype.draw = function (ctx) {
     }
     Entity.prototype.draw.call(this);
 }
+
+function Powerup(game, x, y) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
+    this.startX = x;
+    this.startY = y;
+    this.isHit = false;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    Entity.call(this, game, x , y);
+}
+
+Powerup.prototype = new Entity();
+Powerup.prototype.constructor = Powerup;
+
+
+Powerup.prototype.reset = function() {
+    this.x = this.startX;
+    this.y = this.startY;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+}
+
+Powerup.prototype.update = function () {
+    if (!this.game.running) {
+        return;    
+    }
+
+   // console.log("Coin is : " + this.isHit);
+
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.x -= 200 * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+Powerup.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
+    }
+    Entity.prototype.draw.call(this);
+}
+
 
 function Wall(game, x, y) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
@@ -1232,6 +1325,23 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
             } 
 
 
+            blk = new Block(gameEngine, 7470, 250);
+            gameEngine.addEntity(blk);
+            blocks.push(blk);
+            blk = new Block(gameEngine, 7535, 250);
+            gameEngine.addEntity(blk);
+            blocks.push(blk);
+
+
+            for(let i = 0; i < 10; i++){
+
+                spike = new Spike(gameEngine, 7600  + 65 * i, 300);
+                gameEngine.addEntity(spike);
+                spikes.push(spike);
+            
+                } 
+
+
 
     // blk = new Block(gameEngine, 4500, 40);
     // gameEngine.addEntity(blk);
@@ -1359,7 +1469,7 @@ ASSET_MANAGER.queueDownload("./img/platform.png");
 ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
-
+ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
 
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
@@ -1384,6 +1494,9 @@ ASSET_MANAGER.downloadAll(function () {
     var walls = [];
     gameEngine.walls = walls;
 
+    var powerups = [];
+    gameEngine.powerups = powerups;
+
     gameEngine.init(ctx);
     gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
@@ -1392,6 +1505,10 @@ ASSET_MANAGER.downloadAll(function () {
     //gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
     
 
+
+    let powerup = new Powerup(gameEngine, 7500, 190);
+    gameEngine.addEntity(powerup);
+    powerups.push(powerup);
     createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine);
 
 
