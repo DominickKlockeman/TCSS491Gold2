@@ -1538,6 +1538,7 @@ ASSET_MANAGER.queueDownload("./img/credits.png");
 ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
 ASSET_MANAGER.queueDownload("./img/rocketship.png");
 
+
 ASSET_MANAGER.downloadAll(function () {
     console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
