@@ -329,6 +329,8 @@ ReturnToMainMenu = function(ctx, game) {
 
 
 
+
+
 function HandleMainMenuClicks(ctx, game) {
     HandleClicks(game, 300, 519, 115, 151, "single");
     HandleClicks(game, 310, 508, 170, 204, "multi");
@@ -525,7 +527,8 @@ PlayGame.prototype.draw = function (ctx) {
             
         } else if (this.game.credits) {
             ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.mainmenu){
+        } else if(this.game.mainmenu && !this.game.playerFinished){
+            console.log("menu here");
             ctx.font = "50pt Impact";
             ctx.fillText("Space Death Race", 150, 70);
             ctx.font = "30pt Impact";
@@ -574,6 +577,7 @@ function Character(game) {
     this.ground = 350;
     this.isPowerUp = false;
     this.platform = game.platforms[0];
+    this.levelX = 10200;
     console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
@@ -771,7 +775,7 @@ Character.prototype.update = function () {
             }       
 
             if(this.isPowerUp){
-                console.log("POWER UP");
+            
 
                 setTimeout(function() {
 
@@ -781,6 +785,20 @@ Character.prototype.update = function () {
                   }, 3000)
 
 
+            }
+
+            this.levelX -= 250 * this.game.clockTick;
+            console.log(this.levelX);
+
+            if(this.levelX < 0){
+            
+                console.log("YOU WIN");
+                
+                this.game.running = false;
+                this.game.playerFinished = true;
+
+                return;
+         
             }
                 
 
@@ -825,6 +843,7 @@ Character.prototype.reset = function() {
     this.ground = 350;
     this.jumping = false;
     this.falling = false;
+    this.levelX = 10200;
 }
 
 function Laser(game, cube) {
