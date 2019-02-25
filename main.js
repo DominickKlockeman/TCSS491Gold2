@@ -275,8 +275,6 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.alive = true;
                 game.mainmenu = true;
                 game.song = menuBackgroundSound;
-            } else if(func == "player finished") {
-                game.playerFinished = true;
             }
         }
 }
@@ -326,6 +324,8 @@ ReturnToMainMenu = function(ctx, game) {
     HandleClicks(game, 480, 760, 455, 485, "credits back");
     HighlightSelection(ctx, game, 480, 760, 455, 485, "credits back");
 } 
+
+
 
 
 
@@ -525,7 +525,8 @@ PlayGame.prototype.draw = function (ctx) {
             
         } else if (this.game.credits) {
             ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.mainmenu){
+        } else if(this.game.mainmenu && !this.game.playerFinished){
+            console.log("menu here");
             ctx.font = "50pt Impact";
             ctx.fillText("Space Death Race", 150, 70);
             ctx.font = "30pt Impact";
@@ -548,9 +549,12 @@ PlayGame.prototype.draw = function (ctx) {
             ctx.fillText("Giovanni         15.790", 250, 200);
             ctx.fillText("Andrew             2.999", 250, 250);
             ReturnToMainMenu(ctx, this.game);
+
         } else if(this.game.playerFinished) {
+
             ctx.fillText("Congratulations!", 260, 200);
             ctx.fillText("You made it to the spaceship in time!", 110, 250);
+
         }
     }
 }
@@ -573,7 +577,7 @@ function Character(game) {
     this.ground = 350;
     this.isPowerUp = false;
     this.platform = game.platforms[0];
-    this.levelX = 10000;
+    this.levelX = 10200
     console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
@@ -771,7 +775,7 @@ Character.prototype.update = function () {
             }       
 
             if(this.isPowerUp){
-                console.log("POWER UP");
+            
 
                 setTimeout(function() {
 
@@ -789,9 +793,12 @@ Character.prototype.update = function () {
             if(this.levelX < 0){
             
                 console.log("YOU WIN");
-
+                
+                this.game.running = false;
                 this.game.playerFinished = true;
-               // this.game.running = false;
+
+                return;
+         
             }
                 
 
