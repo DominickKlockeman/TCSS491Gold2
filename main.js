@@ -554,6 +554,7 @@ PlayGame.prototype.draw = function (ctx) {
         } else if(this.game.playerFinished) {
             ctx.fillText("Congratulations!", 260, 200);
             ctx.fillText("You made it to the spaceship in time!", 110, 250);
+            ReturnToMainMenu(ctx, this.game);
         }
     }
 }
