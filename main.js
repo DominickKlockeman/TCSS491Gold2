@@ -275,6 +275,8 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.alive = true;
                 game.mainmenu = true;
                 game.song = menuBackgroundSound;
+            } else if(func == "player finished") {
+                game.playerFinished = true;
             }
         }
 }
@@ -549,12 +551,9 @@ PlayGame.prototype.draw = function (ctx) {
             ctx.fillText("Giovanni         15.790", 250, 200);
             ctx.fillText("Andrew             2.999", 250, 250);
             ReturnToMainMenu(ctx, this.game);
-
         } else if(this.game.playerFinished) {
-
             ctx.fillText("Congratulations!", 260, 200);
             ctx.fillText("You made it to the spaceship in time!", 110, 250);
-
         }
     }
 }
