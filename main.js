@@ -831,7 +831,7 @@ function FinishLine(game, x, y) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/finish_line.png"), 0, 0, 64, 64, 0.5, 2, true, false); 
     this.startX = x;
     this.startY = y;
-    this.boundingbox = new BoundingBox(this.x + 128, this.y, 64, 192);
+    this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500);
     Entity.call(this, game, x, y);
 }
 
@@ -841,24 +841,24 @@ FinishLine.prototype.constructor = FinishLine;
 FinishLine.prototype.reset = function (cpX) {
     this.x = this.startX - cpX + 32;
     this.y = this.startY;
-    this.boundingbox = new BoundingBox(this.x + 128, this.y, 64, 192);
+    this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500);
 }
 
 FinishLine.prototype.update = function () {
     if (!this.game.running || this.boundingbox.right < 0) {
         return;
     }
-    this.boundingbox = new BoundingBox(this.x + 128, this.y, 64, 192); 
+    this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500); 
     this.x -= 200 * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 FinishLine.prototype.draw = function (ctx) {
     if (this.game.running) {
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 10);
         // ctx.lineWidth = 1;
         // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 128, this.y, 64, 192);
+        // ctx.strokeRect(this.x + 400, this.y, 64, 500);
     }
     Entity.prototype.draw.call(this);
 }
@@ -873,9 +873,6 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
     platforms.push(mainPlatform);
 
     // Stairs
-    fl = new FinishLine(gameEngine, 500, 210);
-    // gameEngine.addEntity(fl);
-    // finishLines.push(fl);
     cp = new Checkpoint(gameEngine, 600, 210);
     gameEngine.addEntity(cp);
     checkpoints.push(cp);
@@ -983,7 +980,7 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
         spikes.push(spike);
     }
 
-    fl = new FinishLine(gameEngine, 4700, 210);
+    fl = new FinishLine(gameEngine, 4700, 0);
     gameEngine.addEntity(fl);
     finishLines.push(fl);
 
