@@ -61,22 +61,23 @@ Animation.prototype.isDone = function () {
 /******************************************************************************************/
 
 // no inheritance
-function Background(game, spritesheet) {
+function Background(game) {
     this.x = 0;
-    this.y = 1;
-    this.spritesheet = spritesheet;
+    this.y = 0;
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/new_background.png"), 0, 0, 2000, 500, 0.05, 2, true, false);
     this.game = game;
     this.ctx = game.ctx;
 };
 
-Background.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
-        this.x, this.y);
+Background.prototype.draw = function (ctx) {
+    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 1);
+    Entity.prototype.draw.call(this);
 };
 
 Background.prototype.update = function () {
     this.x -= 1;
-    if (this.x < -800) this.x = 0;
+    if (this.x < -1000) this.x = 0;
+    Entity.prototype.update.call(this);
 }
 
 Background.prototype.reset = function () {
@@ -96,7 +97,7 @@ function Foreground(game, spritesheet) {
 };
 
 Foreground.prototype.draw = function () {
-    this.ctx.drawImage(this.spritesheet,
+    this.ctx.drawImage(this.animation,
         this.x, this.y);
 };
 
@@ -290,6 +291,7 @@ PlayGame.prototype.draw = function (ctx) {
 function Character(game) {
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 14, true, false);
     cubeLaser = new Animation(ASSET_MANAGER.getAsset("./img/cube_right_laser.png"), 0, 0, 64, 64, 0.08, 8, true, false);
+    cubeDead = new Animation(ASSET_MANAGER.getAsset("./img/cube_dead.png"), 0, 0, 64, 64, 0.02, 30, false, false);
     this.l = new Laser(this.game);
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
@@ -312,11 +314,14 @@ Character.prototype.constructor = Character;
 
 Character.prototype.update = function () {
     if (this.game.running) {
-        if (this.dead) {
-            this.game.alive = false;
-            this.game.reset(this.cpX);
-            console.log("reset");
-            return;
+        if (this.dead) {    
+            ge = this.game;
+            // setTimeout(function (){
+                ge.alive = false;
+                ge.reset(this.cpX);
+                console.log("reset");
+                return;
+            // }, 1000);
         }
         if (this.game.w && !this.falling && !this.jumping) {
             this.jumping = true;
@@ -493,7 +498,8 @@ Character.prototype.update = function () {
 Character.prototype.draw = function (ctx) {
     if (this.game.running) {
         if (this.dead) {
-            return;
+            this.animation = cubeDead
+            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         } else {
             if (this.jumping) {
                 this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
@@ -503,7 +509,7 @@ Character.prototype.draw = function (ctx) {
                     this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
                     // this.l.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
                 } else {
-                    this.animation = cubeSlideBeginning;
+                    // this.animation = cubeSlideBeginning;
                     this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
                 }
             }
@@ -523,6 +529,7 @@ Character.prototype.reset = function () {
     this.ground = 350;
     this.jumping = false;
     this.falling = true;
+    this.animation = cubeSlideBeginning;
     this.jumpAnimation.elapsedTime = 0;
     this.x = 32;
     if (this.cpY) {
@@ -973,7 +980,6 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
-
     for (let i = 0; i < 3; i++) {
         spike = new Spike(gameEngine, 4300, 200 + 64 * i);
         gameEngine.addEntity(spike);
@@ -1007,12 +1013,13 @@ ASSET_MANAGER.queueDownload("./img/cube_jump.png");
 ASSET_MANAGER.queueDownload("./img/cube_right_laser.png");
 ASSET_MANAGER.queueDownload("./img/laser.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
-ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
+ASSET_MANAGER.queueDownload("./img/new_background.png");
 ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/platform.png");
 ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/checkpoint.png");
+ASSET_MANAGER.queueDownload("./img/cube_dead.png");
 ASSET_MANAGER.queueDownload("./img/checkpoint_activated.png");
 ASSET_MANAGER.queueDownload("./img/finish_line.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
@@ -1043,7 +1050,7 @@ ASSET_MANAGER.downloadAll(function () {
 
     gameEngine.init(ctx);
     gameEngine.start();
-    gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
+    gameEngine.addEntity(new Background(gameEngine));
     createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, gameEngine);
     gameEngine.addEntity(new Character(gameEngine));
     gameEngine.addEntity(new Credits(gameEngine));
