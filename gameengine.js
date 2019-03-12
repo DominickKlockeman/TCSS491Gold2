@@ -212,7 +212,7 @@ GameEngine.prototype.loop = function () {
     this.w = null;
     this.click = null;
     this.wheel = null;
-    this.space = null;
+    //this.space = null;
     // this.draw();
     // this.space = null;
     // this.click = null;

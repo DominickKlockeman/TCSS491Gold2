@@ -566,7 +566,8 @@ PlayGame.prototype.draw = function (ctx) {
 function Character(game) {
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
     cubeLaser = new Animation(ASSET_MANAGER.getAsset("./img/cube_right_laser.png"), 0, 0, 64, 64, 0.08, 8, true, false);
-    this.l = new Laser(this.game);
+    this.laser = new Laser(game, this);
+    game.addEntity(this.laser);
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
     this.jumping = false;
@@ -597,6 +598,16 @@ Character.prototype.update = function () {
         if (this.game.w && !this.falling && !this.jumping) {
             this.jumping = true;
             this.ground = this.y;            
+        }
+        if (this.game.space) {
+            for (let i = 0; i < this.game.walls.length; i++) {
+                let wl = this.game.walls[i];
+                if (this.laser.boundingbox.collide(wl.boundingbox)) {
+                    console.log("shot the wall");
+                    wl.shot = true;
+                 
+                }
+            } 
         }
         if (this.jumping) {
             if (this.jumpAnimation.isDone()) {
@@ -788,7 +799,7 @@ Character.prototype.update = function () {
             }
 
             this.levelX -= 250 * this.game.clockTick;
-            console.log(this.levelX);
+            //console.log(this.levelX);
 
             if(this.levelX < 0){
             
@@ -815,14 +826,15 @@ Character.prototype.draw = function (ctx) {
             if (this.jumping) {
                 this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
             } else {
-                //if (this.game.space) {
-                    //this.animation = cubeLaser;
-                    //this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                    //this.l.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
-                //} else {
+                if (this.game.space) {
+                    this.animation = cubeLaser;
+                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                    this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
+                    
+                } else {
                     this.animation = cubeSlideBeginning;
                     this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                //}
+                }
             }
         }
         
@@ -831,7 +843,7 @@ Character.prototype.draw = function (ctx) {
         // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
         ctx.lineWidth = 3;
         ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.l.x + 400, this.l.y - 20, this.l.width, this.l.height);
+        //ctx.strokeRect(this.laser.x + 400, this.laser.y - 20, this.laser.width, this.laser.height);
         // this.boundingbox = new BoundingBox(x, y + 64, this.width, this.height);
         Entity.prototype.draw.call(this);
     }
@@ -844,12 +856,16 @@ Character.prototype.reset = function() {
     this.jumping = false;
     this.falling = false;
     this.levelX = 10200;
+    this.jumpAnimation.elapsedTime = 0;
 }
 
 function Laser(game, cube) {
     laser = new Animation(ASSET_MANAGER.getAsset("./img/laser.png"), 0, 0, 64, 64, .2, 4, true, true);
     this.animation = laser;
-    this.boundingbox = new BoundingBox(this.x, this.y + 64, this.width, this.height);
+    this.cube = cube;
+    this.game = game;
+    //ctx.strokeRect(136, this.y + 90, 64 * 4 , 32);
+    this.boundingbox = new BoundingBox(136, this.cube.y + 90, 64 * 4, 32);
     Entity.call(this, game, 0, 0);
 }
 
@@ -857,10 +873,21 @@ Laser.prototype = new Entity();
 Laser.prototype.constructor = Laser;
 
 Laser.prototype.update = function () {
+    //function BoundingBox(x, y, width, height) {
+    this.boundingbox = new BoundingBox(136, this.cube.y + 90, 64 * 4, 32);
     Entity.prototype.update.call(this);
 }
 
 Laser.prototype.draw = function (ctx) {
+    if (this.game.running) {
+        if (this.cube.dead) {
+            return
+        }
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(136, this.cube.y + 90, 64 * 4 , 32);
+    }
+    
 }
 
 /******************************************************************************************/
@@ -1108,9 +1135,15 @@ Powerup.prototype.draw = function (ctx) {
 
 
 function Wall(game, x, y) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
+    //function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
+    defaultAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
+    fallingAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall_lowered.png"), 0, 0, 64, 64, 0.025, 12, false, false);
+    
+    this.animation = defaultAnimation;
+    this.shot = false;
     this.startX = x;
     this.startY = y;
+    this.dead = false;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
     Entity.call(this, game, x , y);
 }
@@ -1123,23 +1156,47 @@ Wall.prototype.reset = function() {
     this.x = this.startX;
     this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+    this.shot = false;
+    this.dead = false;
+    this.animation = defaultAnimation;
+    fallingAnimation.elapsedTime = 0;
 }
 
 Wall.prototype.update = function () {
-    if (!this.game.running) {
-        return;    
+    if (this.game.running) { 
+        if (this.shot) {
+            this.boundingbox = new BoundingBox(0, 0, 0, 0);
+        } else {
+            this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+        }
+        this.x -= 200 * this.game.clockTick;
+        
+        
     }
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
-    this.x -= 200 * this.game.clockTick;
+
+    
     Entity.prototype.update.call(this);
 }
 
 Wall.prototype.draw = function (ctx) {
     if (this.game.running) {
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
+       if (!this.dead) {
+            if (this.shot) {
+                if (fallingAnimation.isDone()) {
+                    fallingAnimation.elapsedTime = 0;
+                    this.dead = true;
+                    return;
+                }
+                this.animation = fallingAnimation;
+                console.log("falling");
+            }
+            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+            //console.log("drawing");
+            // ctx.lineWidth = 3;
+            // ctx.strokeStyle = "blue";
+            // ctx.strokeRect(this.x + 64, this.y, 64, 192);
+        
+        }
     }
     Entity.prototype.draw.call(this);
 }
@@ -1159,9 +1216,11 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     let currentPlatform
     let w;
 
-    // w = new Wall(gameEngine, 1650,250);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
+    w = new Wall(gameEngine, 545, 210);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+
 
     //UP STAIRS
     // pf = new Platform(gameEngine, 800, 325, 50, 50, "grey");
@@ -1553,6 +1612,7 @@ ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
 ASSET_MANAGER.queueDownload("./img/block.png");
 ASSET_MANAGER.queueDownload("./img/platform.png");
 ASSET_MANAGER.queueDownload("./img/wall.png");
+ASSET_MANAGER.queueDownload("./img/wall_lowered.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
 ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
