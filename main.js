@@ -200,34 +200,6 @@ RocketShip.prototype.draw = function() {
     Entity.prototype.draw.call(this);
 }
 
-
-/*
-
-Spike.prototype.update = function () {
-    if (!this.game.running) {
-        return;    
-    }
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    this.x -= 200 * this.game.clockTick;
-    Entity.prototype.update.call(this);
-}
-
-Spike.prototype.draw = function (ctx) {
-    if (this.game.running) {
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-    }
-    Entity.prototype.draw.call(this);
-}
-
-
-
-
-*/
-
-
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -794,9 +766,7 @@ Character.prototype.update = function () {
             return;
         
         }
-                
 
-    
     }
     Entity.prototype.update.call(this);
 }
@@ -820,14 +790,9 @@ Character.prototype.draw = function (ctx) {
                 }
             }
         }
-        
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
+
         ctx.lineWidth = 3;
         ctx.strokeStyle = "blue";
-        //ctx.strokeRect(this.laser.x + 400, this.laser.y - 20, this.laser.width, this.laser.height);
-        // this.boundingbox = new BoundingBox(x, y + 64, this.width, this.height);
         Entity.prototype.draw.call(this);
     }
 }
@@ -856,7 +821,6 @@ Laser.prototype = new Entity();
 Laser.prototype.constructor = Laser;
 
 Laser.prototype.update = function () {
-    //function BoundingBox(x, y, width, height) {
     this.boundingbox = new BoundingBox(136, this.cube.y + 90, 64 * 4, 32);
     Entity.prototype.update.call(this);
 }
@@ -866,9 +830,7 @@ Laser.prototype.draw = function (ctx) {
         if (this.cube.dead) {
             return
         }
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(136, this.cube.y + 90, 64 * 4 , 32);
+
     }
     
 }
@@ -896,32 +858,6 @@ Credits.prototype.draw = function(ctx) {
     }
     Entity.prototype.draw.call(this);
 }
-
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
-
-
-/*function SloMo(game, x, y, gnd) {
-    this.ground = gnd;
-    this.x = x;
-    this.y = y;
-    this.boundingbox = new BoundingBox(this.x);
-    Entity.call(this, game, 200, 100);
-}
-
-SloMo.prototype = new Entity();
-SloMo.prototype.constructor = SlowMo;
-
-SloMo.prototype.update = function() {
-
-}
-
-SloMo.prototype.draw = function() {
-
-}
-
-
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -956,7 +892,6 @@ Platform.prototype.update = function () {
 }
 
 Platform.prototype.draw = function (ctx) {
-    // this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
 }
@@ -994,9 +929,6 @@ Spike.prototype.update = function () {
 Spike.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
     }
     Entity.prototype.draw.call(this);
 }
@@ -1031,9 +963,6 @@ Block.prototype.update = function () {
 Block.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
     }
     Entity.prototype.draw.call(this);
 }
@@ -1068,9 +997,7 @@ NewPlatform.prototype.update = function () {
 NewPlatform.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 1;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 314, this.y + 64, 330, 64);
+
     }
     Entity.prototype.draw.call(this);
 }
@@ -1099,8 +1026,6 @@ SpeedPowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
@@ -1109,9 +1034,6 @@ SpeedPowerup.prototype.update = function () {
 SpeedPowerup.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
@@ -1140,8 +1062,6 @@ SloMoPowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
@@ -1150,9 +1070,6 @@ SloMoPowerup.prototype.update = function () {
 SloMoPowerup.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
@@ -1181,8 +1098,6 @@ GodModePowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
@@ -1191,16 +1106,12 @@ GodModePowerup.prototype.update = function () {
 GodModePowerup.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
 
 
 function Wall(game, x, y) {
-    //function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
     defaultAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     fallingAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall_lowered.png"), 0, 0, 64, 64, 0.025, 12, false, false);
     
@@ -1254,10 +1165,6 @@ Wall.prototype.draw = function (ctx) {
                 console.log("falling");
             }
             this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-            //console.log("drawing");
-            // ctx.lineWidth = 3;
-            // ctx.strokeStyle = "blue";
-            // ctx.strokeRect(this.x + 64, this.y, 64, 192);
         
         }
     }
@@ -1269,11 +1176,6 @@ Wall.prototype.draw = function (ctx) {
 
 function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
 
-    // let spike;
-    // let block;
-    // let wall;
-    // let newPlatform;
-
     let spike;
     let start;
     let currentPlatform
@@ -1282,22 +1184,6 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     w = new Wall(gameEngine, 545, 210);
     gameEngine.addEntity(w);
     walls.push(w);
-
-
-
-    //UP STAIRS
-    // pf = new Platform(gameEngine, 800, 325, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
 
     blk = new Block(gameEngine, 800, 275);
     gameEngine.addEntity(blk);
@@ -1314,29 +1200,29 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     /*
     *Spikes in tunnel
     */
-   for (var i = 0; i < 4; i++) { 
-       spike = new Spike(gameEngine, 1564 + 64 * i, 0);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-   }
+    for (var i = 0; i < 4; i++) { 
+        spike = new Spike(gameEngine, 1564 + 64 * i, 0);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
 
-   blk = new Block(gameEngine, 1938, 72);
-   gameEngine.addEntity(blk);
-   blocks.push(blk);
-   blk = new Block(gameEngine, 2138, 0);
-   gameEngine.addEntity(blk);
-   blocks.push(blk);
+    blk = new Block(gameEngine, 1938, 72);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 2138, 0);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
 
-   spk = new Spike(gameEngine, 1938, 136);
-   gameEngine.addEntity(spk);
-   spikes.push(spk);
+    spk = new Spike(gameEngine, 1938, 136);
+    gameEngine.addEntity(spk);
+    spikes.push(spk);
 
-   wl = new Wall(gameEngine, 2138, 128);
-   gameEngine.addEntity(wl);
-   walls.push(wl);
-   wl = new Wall(gameEngine, 2138, 308);
-   gameEngine.addEntity(wl);
-   walls.push(wl);
+    wl = new Wall(gameEngine, 2138, 128);
+    gameEngine.addEntity(wl);
+    walls.push(wl);
+    wl = new Wall(gameEngine, 2138, 308);
+    gameEngine.addEntity(wl);
+    walls.push(wl);
 
    
     //Tunnel
@@ -1350,66 +1236,17 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     npf = new NewPlatform(gameEngine, 1960, 200);
     gameEngine.addEntity(npf);
     platforms.push(npf);
-    // currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
-    // gameEngine.addEntity(currentPlatform);
-    // platforms.push(currentPlatform);
-
-
-
-    /* //UP STAIRS
-    currentPlatform = new Platform(gameEngine, 800, 325, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-    /*
-    *Spikes in tunnel
-    */
-
-   /*start = 1590;
-
-   for(var i = 0; i < 12; i++){
-       
-       start = start + 65;
-       
-
-       spike = new Spike(gameEngine, start , -5);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-
-   }
-
-
-
-    //Tunnel
-    currentPlatform = new Platform(gameEngine, 1600, 200, 800, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform); */
 
     /*
     *Spike under stairs
     */
 
-   for (var i = 0; i < 24; i++) {   
-       spike = new Spike(gameEngine, 2636 + 64 * i, 300);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-   }
-    //DOWNSTAIRS
-    // currentBlock = new Block(gameEngine, 2450, 200);
-    // gameEngine.addEntity(currentBlock);
-    // blocks.push(currentBlock);
+    for (var i = 0; i < 24; i++) {   
+        spike = new Spike(gameEngine, 2636 + 64 * i, 300);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+
     currentBlock = new Block(gameEngine, 2650, 200);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
@@ -1426,18 +1263,7 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
 
-    // spike = new Spike(gameEngine, 2700 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-    // spike = new Spike(gameEngine, 2900 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-    // spike = new Spike(gameEngine, 3100 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-
     //UPSTAIRS
-
     blk = new Block(gameEngine, 3600, 190);
     gameEngine.addEntity(blk);
     blocks.push(blk);
@@ -1450,13 +1276,6 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
     blk = new Block(gameEngine, 4200, 165);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-
-    /*
-    for (let i = 0; i < 4; i++) {
-        spike = new Spike(gameEngine, 4300, 215 + 50 * i);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
-    } */
 
     //TUNNEL
     npf = new NewPlatform(gameEngine, 4150, 190);
@@ -1474,15 +1293,11 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
 
     for(let i = 0; i < 5; i++){
 
-
-    spike = new Spike(gameEngine, 5620, 30 - 65 * i);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-
+        spike = new Spike(gameEngine, 5620, 30 - 65 * i);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
 
     }
-
 
     npf = new NewPlatform(gameEngine, 4900, 250);
     gameEngine.addEntity(npf);
@@ -1493,7 +1308,6 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
 
 
     for(let i = 0; i < 5; i++){
-
 
         spike = new Spike(gameEngine, 5810  + 195 * i, 250);
         gameEngine.addEntity(spike);
@@ -1508,157 +1322,42 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
         gameEngine.addEntity(blk);
         blocks.push(blk);
 
+    } 
+
+    for(let i = 0; i < 5; i++){
+
+        spike = new Spike(gameEngine, 6800  + 135 * i, 250);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+        spike = new Spike(gameEngine, 6800  + 135 * i, -100);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);   
+        blk = new Block(gameEngine, 6865 + 135 * i, 250);
+        gameEngine.addEntity(blk);
+        blocks.push(blk);
     
+    } 
+
+
+    blk = new Block(gameEngine, 7470, 250);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7535, 250);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    for(let i = 0; i < 10; i++){
+
+        spike = new Spike(gameEngine, 7600  + 65 * i, 300);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
     
-    
-        } 
-
-        for(let i = 0; i < 5; i++){
-
-
-            spike = new Spike(gameEngine, 6800  + 135 * i, 250);
-            gameEngine.addEntity(spike);
-            spikes.push(spike);
-            spike = new Spike(gameEngine, 6800  + 135 * i, -100);
-            gameEngine.addEntity(spike);
-            spikes.push(spike);   
-            blk = new Block(gameEngine, 6865 + 135 * i, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
-
-            
-        
-        
-        
-            } 
-
-
-            blk = new Block(gameEngine, 7470, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
-            blk = new Block(gameEngine, 7535, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
-
-
-            for(let i = 0; i < 10; i++){
-
-                spike = new Spike(gameEngine, 7600  + 65 * i, 300);
-                gameEngine.addEntity(spike);
-                spikes.push(spike);
-            
-                } 
-
-
-
-    // blk = new Block(gameEngine, 4500, 40);
-    // gameEngine.addEntity(blk);
-    // blocks.push(blk);
-
-
-  
-  /*
-   start = 2375;
-
-   for(var i = 0; i < 28; i++){
-    
-       start = start + 65;
-       
-
-       spike = new Spike(gameEngine, start ,270);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-
-   }
-
-
-    //DOWNSTAIRS
-    currentPlatform = new Platform(gameEngine, 2450, 280, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 2650, 280, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 2800, 200, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3000, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3200, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3400, 275, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-    spike = new Spike(gameEngine, 2700 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 2900 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 3100 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-    //UPSTAIRS
-
-    currentPlatform = new Platform(gameEngine, 3600, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3800, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4000, 200, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4200, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-
-
-    spike = new Spike(gameEngine, 4300, 150);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 200);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 250);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 300);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-
-
-    //TUNNEL
-
-    currentPlatform = new Platform(gameEngine, 4400, 250, 1000, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4500, 100, 1000, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform); */
-
-    // w = new Wall(gameEngine, 5000,-100);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
-
-
-    // w = new Wall(gameEngine, 5000,300);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
-
-    
+    } 
 
     //GROUND
     currentPlatform = new Platform(gameEngine, 0, 400, 1000000000000000, 100, "black");
     gameEngine.addEntity(currentPlatform);
     platforms.push(currentPlatform);    
-
 
 }
 
@@ -1721,10 +1420,7 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
-    gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
-    //gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
-    
-
+    gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));    
 
     let speedPowerup = new SpeedPowerup(gameEngine, 7500, 190);
     gameEngine.addEntity(speedPowerup);
@@ -1740,19 +1436,8 @@ ASSET_MANAGER.downloadAll(function () {
 
     createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine);
 
-
     gameEngine.addEntity(new Character(gameEngine)); 
-    // gameEngine.addEntity(new Laser(gameEngine)); 
-    /*createMap(platforms, spikes, gameEngine);
-
-
-    gameEngine.addEntity(new Character(gameEngine)); 
-    gameEngine.addEntity(new Spike(gameEngine)); */
-
     gameEngine.addEntity(new Credits(gameEngine));
- //   gameEngine.addEntity(new HandleClicks(gameEngine));
- //   gameEngine.addEntity(new HighlightSelection(gameEngine));
- //   gameEngine.mainmenu = true;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
 });
