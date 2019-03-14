@@ -529,7 +529,7 @@ Character.prototype.update = function () {
             this.jumping = true;
             this.ground = this.y;            
         }
-        if (this.game.space && !this.jumping) {
+        if (this.game.space && !this.jumping && !this.falling) {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.laser.boundingbox.collide(wl.boundingbox)) {
@@ -748,7 +748,7 @@ Character.prototype.draw = function (ctx) {
             if (this.jumping) {
                 this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
             } else {
-                if (this.game.space) {
+                if (this.game.space && !this.jumping && !this.falling) {
                     this.animation = cubeLaser;
                     this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
                     this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
