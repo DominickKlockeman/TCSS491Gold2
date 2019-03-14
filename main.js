@@ -1,3 +1,12 @@
+//
+//  ADD FIELD TO EVERY ENTITY TO ONLY DISPLAY WHEN GAME.LEVEL1 IS CALLED. ADD FIELD IN GAME ENGINE
+//  THAT HANDLES WHICH ONE. SO WHEN THAT MENU ITEM IS CLICKED. SEND GAMEENGINE.MAP TO 1, 2, OR 3.
+//  THEN IN EACH ENTITY'S DRAW, DO, (GAME.RUNNING && THIS.MAPNUM == GAME.MAPNUM). IN EACH CREATE MAP
+//  FUNCTION ADD EACH NUMBER THAT CORRESPONDS TO EACH MAP. SO WHENEVER A NEW ENTITY CALLED, SET THAT 
+//  ENTITY'S MAP FIELD. SHOULD WORK. GOOD JOB DOMI.
+//
+/////////////////////////////////////////
+
 var menuSelectSound = new Audio("MeleeMenuSelect Sound.mp3");
 var gameBackgroundSound = new Audio("gameMusic.mp3");
 
@@ -187,10 +196,10 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
                 game.levelselection = true;
                 game.mainmenu = false;
             } else if(func == "multi") {
-                game.inmenus = false;
-                game.actualTime.gameTime = 0;
-                game.multi = true;
-                game.mainmenu = false;
+                // game.inmenus = false;
+                // game.actualTime.gameTime = 0;
+                // game.multi = true;
+                // game.mainmenu = false;
             } else if(func == "naked") {
                 game.naked = true; 
                 game.levelselection = true;
@@ -240,7 +249,7 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
                 SelectMap(game, 2);
             } else if(func == "map 3") {
                 SelectMap(game, 3);
-            }
+            } 
         }
 }
 
@@ -259,20 +268,18 @@ SelectMap = function(game, map) {
             var blank1 = [];
             var blank2 = [];
             var blank3 = [];
-            game.sloMoPowerups = [null];
-            game.speedPowerups = [null]; 
-            game.godModePowerups = [null];
+            game.sloMoPowerups = blank1;
+            game.speedPowerups = blank2; 
+            game.godModePowerups = blank3;
         } else {
             game.speedPowerups = game.speedPowerups1;
             game.sloMoPowerups = game.sloMoPowerups1;
             game.godModePowerups = game.godModePowerups1;
         }
-        game.speedPowerups = game.speedPowerups1;
-        game.sloMoPowerups = game.sloMoPowerups1;
-        game.godModePowerups = game.godModePowerups1;
         game.finishLines = game.finishLines1;
         game.checkpoints = game.checkpoints1;
         game.character.platform = game.platforms1[0];
+        game.map = 1;
 
     } else if(map == 2) {
         game.blocks = game.blocks2;
@@ -296,6 +303,8 @@ SelectMap = function(game, map) {
         game.finishLines = game.finishLines2;
         game.checkpoints = game.checkpoints2;
         game.character.platform = game.platforms2[0];
+        game.map = 2;
+
     } else if(map == 3) {
         game.blocks = game.blocks3;
         game.spikes = game.spikes3;
@@ -318,6 +327,8 @@ SelectMap = function(game, map) {
         game.finishLines = game.finishLines3;
         game.checkpoints = game.checkpoints3;
         game.character.platform = game.platforms3[0];
+        game.map = 3;
+
     }
     game.canbepaused = true;
     game.song.pause();
@@ -572,10 +583,7 @@ PlayGame.prototype.draw = function (ctx) {
         if(this.game.finishLevel) {
             this.game.canbepaused = false;
             ctx.fillText("You Win!", 330, 200);
-            ctx.fillText("Replay", 346, 250);
             ctx.fillText("Return to Main Menu", 250, 300);
-            HandleClicks(ctx, this.game, 346, 480, 220, 255, "single");
-            HighlightSelection(ctx, this.game, 346, 480, 220, 255, "dead");
             HandleClicks(ctx, this.game, 253, 587, 270, 302, "end game main menu");
             HighlightSelection(ctx, this.game, 253, 587, 270, 302, "end game main menu");
             
@@ -639,7 +647,6 @@ function Character(game) {
     game.alive = !this.dead;
     this.ground = 350;
     this.platform = game.platforms[0];
-    console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
 }
@@ -648,22 +655,22 @@ Character.prototype = new Entity();
 Character.prototype.constructor = Character;
 
 Character.prototype.update = function () {
+    this.game.godMode = true;
+    this.game.gameSpeed = 1000;
     if (this.game.running) {
         if (this.dead) {
             this.game.alive = false; 
             this.game.reset(this.cpX);
-            console.log("reset");
             return;
         }
         if (this.game.w && !this.falling && !this.jumping) {
             this.jumping = true;
             this.ground = this.y;            
         }
-        if (this.game.space) {
+        if (this.game.space && !this.jumping && !this.falling) {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.laser.boundingbox.collide(wl.boundingbox)) {
-                    console.log("shot the wall");
                     wl.shot = true;
                  
                 }
@@ -693,7 +700,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentPlatform.boundingbox) 
                 && this.lastBottom <= currentPlatform.boundingbox.top
                 && currentPlatform instanceof Platform) {
-                    console.log("shouldve jumped onto platform");
                     this.jumping = false;
                     this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentPlatform;
@@ -705,7 +711,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentBlock.boundingbox) 
                 && this.lastBottom <= currentBlock.boundingbox.top
                 && currentBlock instanceof Block) {
-                    console.log("shouldve jumped onto block");
                     this.jumping = false;
                     this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentBlock;
@@ -717,7 +722,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
                 && this.lastBottom <= currentNewPlatform.boundingbox.top
                 && currentNewPlatform instanceof NewPlatform) {
-                    console.log("shouldve jumped onto new platform");
                     this.jumping = false;
                     this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentNewPlatform;
@@ -726,7 +730,6 @@ Character.prototype.update = function () {
             }               
         }
         if (this.falling) {
-            console.log("falling");
             this.lastBottom = this.boundingbox.bottom;
             this.y += 15;
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
@@ -735,7 +738,6 @@ Character.prototype.update = function () {
                 let pf = this.game.platforms[i];
                 if (this.boundingbox.collide(pf.boundingbox) 
                 && this.lastBottom <= pf.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = pf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = pf;
@@ -745,7 +747,6 @@ Character.prototype.update = function () {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox) 
                 && this.lastBottom <= blk.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = blk.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = blk;
@@ -755,7 +756,6 @@ Character.prototype.update = function () {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox) 
                 && this.lastBottom <= npf.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = npf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = npf;
@@ -767,9 +767,7 @@ Character.prototype.update = function () {
         if (!this.jumping && !this.falling) {
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
             if (this.boundingbox.left > this.platform.boundingbox.right) {
-                this.falling = true;
-                console.log("should fall");
-            }
+                this.falling = true;            }
         }
         this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 
@@ -785,7 +783,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.spikes.length; i++) {
                 let spk = this.game.spikes[i];
                 if (this.boundingbox.collide(spk.boundingbox)) {
-                    console.log("hit spike")
                     this.dead = true;
                 }
             }
@@ -793,7 +790,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.blocks.length; i++) {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox)) {
-                    console.log("hit block")
                     this.dead = true;
                 }
             }
@@ -801,7 +797,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.newPlatforms.length; i++) {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox)) {
-                    console.log("hit new pf")
                     this.dead = true;
                 }
             }
@@ -809,7 +804,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.boundingbox.collide(wl.boundingbox)) {
-                    console.log("hit wall")
                     this.dead = true;
                 }
             }
@@ -829,7 +823,6 @@ Character.prototype.update = function () {
             if (this.boundingbox.collide(pu.boundingbox)) {
                 
                 this.game.sloMo = true;
-                console.log(pu.y);
                 
             }
         } 
@@ -1003,10 +996,11 @@ Platform.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Spike(game, x, y) {
+function Spike(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
@@ -1031,16 +1025,17 @@ Spike.prototype.update = function () {
 }
 
 Spike.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
-function Block(game, x, y) {
+function Block(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
@@ -1065,16 +1060,17 @@ Block.prototype.update = function () {
 }
 
 Block.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
-function NewPlatform(game, x, y) {
+function NewPlatform(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/platform.png"), 0, 0, 320, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x + 314, this.y, 330, 64);
     Entity.call(this, game, x , y);
 }
@@ -1099,17 +1095,18 @@ NewPlatform.prototype.update = function () {
 }
 
 NewPlatform.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
 
     }
     Entity.prototype.draw.call(this);
 }
 
-function SpeedPowerup(game, x, y) {
+function SpeedPowerup(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
@@ -1136,16 +1133,17 @@ SpeedPowerup.prototype.update = function () {
 }
 
 SpeedPowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
-function SloMoPowerup(game, x, y) {
+function SloMoPowerup(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/slow.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
@@ -1172,16 +1170,17 @@ SloMoPowerup.prototype.update = function () {
 }
 
 SloMoPowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
-function GodModePowerup(game, x, y) {
+function GodModePowerup(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
@@ -1208,14 +1207,14 @@ GodModePowerup.prototype.update = function () {
 }
 
 GodModePowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
 
-function Wall(game, x, y) {
+function Wall(game, x, y, map) {
     defaultAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     fallingAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall_lowered.png"), 0, 0, 64, 64, 0.025, 12, false, false);
     
@@ -1223,6 +1222,7 @@ function Wall(game, x, y) {
     this.shot = false;
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.dead = false;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
     Entity.call(this, game, x , y);
@@ -1257,7 +1257,7 @@ Wall.prototype.update = function () {
 }
 
 Wall.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
        if (!this.dead) {
             if (this.shot) {
                 if (fallingAnimation.isDone()) {
@@ -1266,7 +1266,7 @@ Wall.prototype.draw = function (ctx) {
                     return;
                 }
                 this.animation = fallingAnimation;
-                console.log("falling");
+
             }
             this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         
@@ -1279,12 +1279,13 @@ Wall.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Checkpoint(game, x, y) {
+function Checkpoint(game, x, y, map) {
     this.unactivatedCp = new Animation(ASSET_MANAGER.getAsset("./img/checkpoint.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.activatedCp = new Animation(ASSET_MANAGER.getAsset("./img/checkpoint_activated.png"), 0, 0, 64, 64, 0.5, 2, true, false); 
     this.animation = this.unactivatedCp;
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
     Entity.call(this, game, x, y);
 }
@@ -1311,16 +1312,17 @@ Checkpoint.prototype.update = function () {
 }
 
 Checkpoint.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
-function FinishLine(game, x, y) {
+function FinishLine(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/finish_line.png"), 0, 0, 64, 64, 0.5, 2, true, false); 
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500);
     Entity.call(this, game, x, y);
 }
@@ -1344,7 +1346,7 @@ FinishLine.prototype.update = function () {
 }
 
 FinishLine.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 10);
     }
     Entity.prototype.draw.call(this);
@@ -1354,190 +1356,315 @@ FinishLine.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
+function createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
+    let platform, spike, block, newPlatform, wall, checkPoint, finishLine, speedPowerup, sloMoPowerup, godModePowerup;
+    
+    //GROUND
+    platform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
+    gameEngine.addEntity(platform);
+    platforms.push(platform);    
+
+    block = new Block(gameEngine, 450, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    block = new Block(gameEngine, 750, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 814, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    checkPoint = new Checkpoint(gameEngine, 930, 210, 1);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
+
+    speedPowerup = new SpeedPowerup(gameEngine, 1100, 275, 1);
+    gameEngine.addEntity(speedPowerup);
+    speedPowerups.push(speedPowerup);
+
+    spike = new Spike(gameEngine, 1700, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    //UPSTAIRS
+    block = new Block(gameEngine, 2500, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2650, 190, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2850, 165, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3050, 140, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3250, 165, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    //Sky bridge
+    newPlatform = new NewPlatform(gameEngine, 3200, 190, 1);
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
+    newPlatform = new NewPlatform(gameEngine, 3650, 190), 1;
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
+
+    godModePowerup = new GodModePowerup(gameEngine, 4800, 275, 1);
+    gameEngine.addEntity(godModePowerup);
+    godModePowerups.push(godModePowerup);
+
+    spike = new Spike(gameEngine, 5000, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5064, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5128, 275), 1;
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5192, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5256, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5320, 275), 1;
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5384, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5448, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5512, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5576, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5640, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    block = new Block(gameEngine, 6200, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    checkPoint = new Checkpoint(gameEngine, 6500, 210, 1);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
+
+    wall = new Wall(gameEngine, 6900, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    sloMoPowerup = new SloMoPowerup(gameEngine, 7200, 275, 1);
+    gameEngine.addEntity(sloMoPowerup);
+    sloMoPowerups.push(sloMoPowerup);
+
+    wall = new Wall(gameEngine, 7400, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    wall = new Wall(gameEngine, 7800, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    finishLine = new FinishLine(gameEngine, 8300, 100, 1);
+    gameEngine.addEntity(finishLine);
+    finishLines.push(finishLine);
+}
+
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
 function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
 
 
-    w = new Wall(gameEngine, 530, 210);
+    w = new Wall(gameEngine, 530, 210, 2);
     gameEngine.addEntity(w);
     walls.push(w);
 
-        // Stairs
-    // cp = new Checkpoint(gameEngine, 800, 150);
-    // gameEngine.addEntity(cp);
-    // checkpoints.push(cp);
 
-    blk = new Block(gameEngine, 800, 275);
+    // STAIRS 
+    blk = new Block(gameEngine, 800, 275, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1000, 250);
+    blk = new Block(gameEngine, 1000, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1200, 225);
+    blk = new Block(gameEngine, 1200, 225, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1400, 200);
+    blk = new Block(gameEngine, 1400, 200, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
     /*
     *Spikes in tunnel
     */
     for (var i = 0; i < 4; i++) { 
-        spike = new Spike(gameEngine, 1564 + 64 * i, 0);
+        spike = new Spike(gameEngine, 1564 + 64 * i, 0, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
     }
 
-    blk = new Block(gameEngine, 1938, 72);
+    blk = new Block(gameEngine, 1938, 72, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 2138, 0);
+    blk = new Block(gameEngine, 2138, 0, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
-    spk = new Spike(gameEngine, 1938, 136);
+    spk = new Spike(gameEngine, 1938, 136, 2);
     gameEngine.addEntity(spk);
     spikes.push(spk);
 
-    wl = new Wall(gameEngine, 2138, 128);
+    wl = new Wall(gameEngine, 2138, 128, 2);
     gameEngine.addEntity(wl);
     walls.push(wl);
-    wl = new Wall(gameEngine, 2138, 308);
+    wl = new Wall(gameEngine, 2138, 308, 2);
     gameEngine.addEntity(wl);
     walls.push(wl);
 
-    cp = new Checkpoint(gameEngine, 2138, -128);
+    cp = new Checkpoint(gameEngine, 2138, -128, 2);
     gameEngine.addEntity(cp);
     checkpoints.push(cp);
 
    
     //Tunnel
-    npf = new NewPlatform(gameEngine, 1300, 200);
+    npf = new NewPlatform(gameEngine, 1300, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1630, 200);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1630, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1960, 200);
+    newPlatforms.push(npf);
+    // platforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1960, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     /*
     *Spike under stairs
     */
 
     for (var i = 0; i < 24; i++) {   
-        spike = new Spike(gameEngine, 2636 + 64 * i, 300);
+        spike = new Spike(gameEngine, 2636 + 64 * i, 300, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
     }
 
-    currentBlock = new Block(gameEngine, 2650, 200);
+    currentBlock = new Block(gameEngine, 2650, 200, 2);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 2800, 120);
+    currentBlock = new Block(gameEngine, 2800, 120, 2);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3000, 195);
+    currentBlock = new Block(gameEngine, 3000, 195, 2);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3200, 180);
+    currentBlock = new Block(gameEngine, 3200, 180, 2);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3400, 255);
+    currentBlock = new Block(gameEngine, 3400, 255, 2);
     gameEngine.addEntity(currentBlock);
     blocks.push(currentBlock);
 
     //UPSTAIRS
-    blk = new Block(gameEngine, 3600, 190);
+    blk = new Block(gameEngine, 3600, 190, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 3800, 165);
+    blk = new Block(gameEngine, 3800, 165, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 4000, 140);
+    blk = new Block(gameEngine, 4000, 140, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 4200, 165);
+    blk = new Block(gameEngine, 4200, 165, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
     //TUNNEL
-    npf = new NewPlatform(gameEngine, 4150, 190);
+    npf = new NewPlatform(gameEngine, 4150, 190, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
 
-    npf = new NewPlatform(gameEngine, 4600, 190);
+    npf = new NewPlatform(gameEngine, 4600, 190, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
-    npf = new NewPlatform(gameEngine, 5100, 90);
+    npf = new NewPlatform(gameEngine, 5100, 90, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     for(let i = 0; i < 5; i++){
 
-        spike = new Spike(gameEngine, 5620, 30 - 65 * i);
+        spike = new Spike(gameEngine, 5620, 30 - 65 * i, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
 
     }
 
-    npf = new NewPlatform(gameEngine, 4900, 250);
+    npf = new NewPlatform(gameEngine, 4900, 250, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 5225, 250);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 5225, 250, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
 
-    blk = new Block(gameEngine, 5812, 250);
+    blk = new Block(gameEngine, 5812, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
     for(let i = 0; i < 5; i++){
 
-        spike = new Spike(gameEngine, 5875  + 195 * i, 250);
+        spike = new Spike(gameEngine, 5875  + 195 * i, 250, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
-        spike = new Spike(gameEngine, 5875  + 195 * i, -100);
+        spike = new Spike(gameEngine, 5875  + 195 * i, -100, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);   
-        blk = new Block(gameEngine, 5940 + 195 * i, 250);
+        blk = new Block(gameEngine, 5940 + 195 * i, 250), 2;
         gameEngine.addEntity(blk);
         blocks.push(blk);
-        blk = new Block(gameEngine, 6008 + 195 * i, 250);
+        blk = new Block(gameEngine, 6008 + 195 * i, 250, 2);
         gameEngine.addEntity(blk);
         blocks.push(blk);
-        console.log(6010 + 195 * i);
 
     } 
 
     for(let i = 0; i < 5; i++){
 
-        spike = new Spike(gameEngine, 6850  + 135 * i, 250);
+        spike = new Spike(gameEngine, 6850  + 135 * i, 250, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
-        spike = new Spike(gameEngine, 6850  + 135 * i, -100);
+        spike = new Spike(gameEngine, 6850  + 135 * i, -100, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);   
-        blk = new Block(gameEngine, 6920 + 135 * i, 250);
+        blk = new Block(gameEngine, 6920 + 135 * i, 250, 2);
         gameEngine.addEntity(blk);
         blocks.push(blk);
     
     } 
 
 
-    blk = new Block(gameEngine, 7525, 250);
+    blk = new Block(gameEngine, 7525, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 7590, 250);
+    blk = new Block(gameEngine, 7590, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
 
-    fl = new FinishLine(gameEngine, 7600, 100);
+    fl = new FinishLine(gameEngine, 7600, 100, 2);
     gameEngine.addEntity(fl);
     finishLines.push(fl);
 
@@ -1546,11 +1673,11 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
     // gameEngine.addEntity(speedPowerup);
     // speedPowerups.push(speedPowerup);
 
-    let sloMoPowerup = new SloMoPowerup(gameEngine, 2200, 270);
+    let sloMoPowerup = new SloMoPowerup(gameEngine, 2200, 270, 2);
     gameEngine.addEntity(sloMoPowerup);
     sloMoPowerups.push(sloMoPowerup);
 
-    let godModePowerup = new GodModePowerup(gameEngine, 5760, 190);
+    let godModePowerup = new GodModePowerup(gameEngine, 5760, 190, 2);
     gameEngine.addEntity(godModePowerup);
     godModePowerups.push(godModePowerup);
 
@@ -1588,7 +1715,6 @@ ASSET_MANAGER.queueDownload("./img/slow.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
-    console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
     document.getElementById('gameWorld').focus();
     var ctx = canvas.getContext('2d');
@@ -1667,6 +1793,8 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.godModePowerups2 = godModePowerups2;
 
     createMap2(platforms2, spikes2, blocks2, newPlatforms2, walls2, checkpoints2, finishLines2, speedPowerups2, sloMoPowerups2, godModePowerups2, gameEngine);
+    createMap1(platforms1, spikes1, blocks1, newPlatforms1, walls1, checkpoints1, finishLines1, speedPowerups1, sloMoPowerups1, godModePowerups1, gameEngine);
+
     gameEngine.blocks = blocks1;
     gameEngine.spikes = spikes1;
     gameEngine.walls = walls1;
