@@ -78,9 +78,12 @@ function GameEngine() {
     this.running = false;
     this.inmenus = true;
     this.ispaused = false;
+    this.levelselection = false;
     this.volume = 3;
     this.song = menuBackgroundSound;
     this.playerFinished;
+    this.firstCp = false;
+    this.character;
     this.powerUpTimer = 300;
     this.sloMo = false;
     this.speedUp = false;
@@ -232,10 +235,16 @@ GameEngine.prototype.update = function () {
 }
 
 GameEngine.prototype.reset = function (cpX) {
+    for (var i = cpX; i < this.checkpoints.length; i++) {
+        let cp = this.checkpoints[i];
+        cp.animation = cp.unactivatedCp;
+    }
     for (var i = 0; i < this.entities.length; i++) {
         this.entities[i].reset(cpX);
 
     }
+
+    
     this.gameSpeed = 200;
     this.godMode = false;
     this.speedUp = false;
