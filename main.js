@@ -655,8 +655,6 @@ Character.prototype = new Entity();
 Character.prototype.constructor = Character;
 
 Character.prototype.update = function () {
-    this.game.godMode = true;
-    this.game.gameSpeed = 1000;
     if (this.game.running) {
         if (this.dead) {
             this.game.alive = false; 
