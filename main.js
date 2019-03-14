@@ -224,6 +224,7 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
                 game.reset(0);
                 game.character.y = 270;
                 game.character.cpY = 270;
+                game.character.cpX = 0;
                 game.firstCp = false;
             } else if(func == "leaderboard") {
                 game.leaderboard = true; 
@@ -242,6 +243,7 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
                 game.reset(0);
                 game.character.y = 270;
                 game.character.cpY = 270;
+                game.character.cpX = 0;
                 game.firstCp = false;
             } else if(func == "map 1") {
                 SelectMap(game, 1);
