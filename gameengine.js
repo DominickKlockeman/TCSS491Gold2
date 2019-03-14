@@ -231,9 +231,9 @@ GameEngine.prototype.update = function () {
     this.powerupClockSpeed += 1;
 }
 
-GameEngine.prototype.reset = function () {
+GameEngine.prototype.reset = function (cpX) {
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].reset();
+        this.entities[i].reset(cpX);
 
     }
     this.gameSpeed = 200;
