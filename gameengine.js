@@ -183,14 +183,12 @@ GameEngine.prototype.update = function () {
     }
 
     if(this.speedUp && this.powerUpTimer > 0) {
-        this.gameSpeed = 250;
-        console.log(this.powerUpTimer);
+        this.gameSpeed = 275;
 
     } else if(this.sloMo && this.powerUpTimer > 0){
         
 
     } else if(this.godMode && this.powerUpTimer > 0) {
-
     
     }else {
         this.gameSpeed = 200;
@@ -240,9 +238,6 @@ GameEngine.prototype.reset = function (cpX) {
     this.godMode = false;
     this.speedUp = false;
     this.sloMo = false;
-    //console.log(this.actualTime.gameTime);
-    // this.actualTime.gameTime = 0;
-
 }
 
 GameEngine.prototype.loop = function () {

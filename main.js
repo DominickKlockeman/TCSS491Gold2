@@ -463,7 +463,6 @@ PlayGame.prototype.draw = function (ctx) {
         } else if (this.game.credits) {
             ReturnToMainMenu(ctx, this.game);
         } else if(this.game.mainmenu){
-            console.log("menu here");
             ctx.font = "50pt Impact";
             ctx.fillText("Space Death Race", 150, 70);
             ctx.font = "30pt Impact";
@@ -509,7 +508,6 @@ function Character(game) {
     game.alive = !this.dead;
     this.ground = 350;
     this.platform = game.platforms[0];
-    console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
 }
@@ -522,7 +520,6 @@ Character.prototype.update = function () {
         if (this.dead) {
             this.game.alive = false; 
             this.game.reset(this.cpX);
-            console.log("reset");
             return;
         }
         if (this.game.w && !this.falling && !this.jumping) {
@@ -533,9 +530,7 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.laser.boundingbox.collide(wl.boundingbox)) {
-                    console.log("shot the wall");
                     wl.shot = true;
-                 
                 }
             } 
         }
@@ -563,7 +558,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentPlatform.boundingbox) 
                 && this.lastBottom <= currentPlatform.boundingbox.top
                 && currentPlatform instanceof Platform) {
-                    console.log("shouldve jumped onto platform");
                     this.jumping = false;
                     this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentPlatform;
@@ -575,7 +569,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentBlock.boundingbox) 
                 && this.lastBottom <= currentBlock.boundingbox.top
                 && currentBlock instanceof Block) {
-                    console.log("shouldve jumped onto block");
                     this.jumping = false;
                     this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentBlock;
@@ -587,7 +580,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
                 && this.lastBottom <= currentNewPlatform.boundingbox.top
                 && currentNewPlatform instanceof NewPlatform) {
-                    console.log("shouldve jumped onto new platform");
                     this.jumping = false;
                     this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentNewPlatform;
@@ -596,7 +588,6 @@ Character.prototype.update = function () {
             }               
         }
         if (this.falling) {
-            console.log("falling");
             this.lastBottom = this.boundingbox.bottom;
             this.y += 15;
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
@@ -605,7 +596,6 @@ Character.prototype.update = function () {
                 let pf = this.game.platforms[i];
                 if (this.boundingbox.collide(pf.boundingbox) 
                 && this.lastBottom <= pf.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = pf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = pf;
@@ -615,7 +605,6 @@ Character.prototype.update = function () {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox) 
                 && this.lastBottom <= blk.boundingbox.top) {
-                    console.log("landed on block platform");
                     this.falling = false;
                     this.y = blk.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = blk;
@@ -625,7 +614,6 @@ Character.prototype.update = function () {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox) 
                 && this.lastBottom <= npf.boundingbox.top) {
-                    console.log("landed on new platform");
                     this.falling = false;
                     this.y = npf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = npf;
@@ -638,7 +626,6 @@ Character.prototype.update = function () {
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
             if (this.boundingbox.left > this.platform.boundingbox.right) {
                 this.falling = true;
-                console.log("should fall");
             }
         }
         this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
@@ -655,7 +642,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.spikes.length; i++) {
                 let spk = this.game.spikes[i];
                 if (this.boundingbox.collide(spk.boundingbox)) {
-                    console.log("hit spike")
                     this.dead = true;
                 }
             }
@@ -663,7 +649,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.blocks.length; i++) {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox)) {
-                    console.log("hit block")
                     this.dead = true;
                 }
             }
@@ -671,7 +656,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.newPlatforms.length; i++) {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox)) {
-                    console.log("hit new pf")
                     this.dead = true;
                 }
             }
@@ -679,7 +663,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.boundingbox.collide(wl.boundingbox)) {
-                    console.log("hit wall")
                     this.dead = true;
                 }
             }
@@ -1132,7 +1115,6 @@ Wall.prototype.draw = function (ctx) {
                     return;
                 }
                 this.animation = fallingAnimation;
-                console.log("falling");
             }
             this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
         
@@ -1217,203 +1199,127 @@ FinishLine.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, gameEngine) {
+function createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
+    let platform, spike, block, newPlatform, wall, checkPoint, finishLine, speedPowerup, sloMoPowerup, godModePowerup;
+    
+    //GROUND
+    platform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
+    gameEngine.addEntity(platform);
+    platforms.push(platform);    
 
-    let spike;
-    let currentPlatform
-    let w;
+    block = new Block(gameEngine, 450, 275);
+    gameEngine.addEntity(block);
+    blocks.push(block);
 
-    // w = new Wall(gameEngine, 545, 210);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
+    block = new Block(gameEngine, 750, 275);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 814, 275);
+    gameEngine.addEntity(block);
+    blocks.push(block);
 
-        // Stairs
-    cp = new Checkpoint(gameEngine, 600, 210);
-    gameEngine.addEntity(cp);
-    checkpoints.push(cp);
+    checkPoint = new Checkpoint(gameEngine, 930, 210);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
 
-    blk = new Block(gameEngine, 800, 275);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 1000, 250);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 1200, 225);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 1400, 200);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    /*
-    *Spikes in tunnel
-    */
-    for (var i = 0; i < 4; i++) { 
-        spike = new Spike(gameEngine, 1564 + 64 * i, 0);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
-    }
+    speedPowerup = new SpeedPowerup(gameEngine, 1100, 275);
+    gameEngine.addEntity(speedPowerup);
+    speedPowerups.push(speedPowerup);
 
-    blk = new Block(gameEngine, 1938, 72);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 2138, 0);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-
-    spk = new Spike(gameEngine, 1938, 136);
-    gameEngine.addEntity(spk);
-    spikes.push(spk);
-
-    wl = new Wall(gameEngine, 2138, 128);
-    gameEngine.addEntity(wl);
-    walls.push(wl);
-    wl = new Wall(gameEngine, 2138, 308);
-    gameEngine.addEntity(wl);
-    walls.push(wl);
-
-    cp = new Checkpoint(gameEngine, 2138, -128);
-    gameEngine.addEntity(cp);
-    checkpoints.push(cp);
-
-   
-    //Tunnel
-    npf = new NewPlatform(gameEngine, 1300, 200);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1630, 200);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
-    newPlatforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1960, 200);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
-
-    /*
-    *Spike under stairs
-    */
-
-    for (var i = 0; i < 24; i++) {   
-        spike = new Spike(gameEngine, 2636 + 64 * i, 300);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
-    }
-
-    currentBlock = new Block(gameEngine, 2650, 200);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 2800, 120);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3000, 195);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3200, 180);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3400, 255);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
+    spike = new Spike(gameEngine, 1700, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
 
     //UPSTAIRS
-    blk = new Block(gameEngine, 3600, 190);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 3800, 165);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 4000, 140);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 4200, 165);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
+    block = new Block(gameEngine, 2500, 275);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2650, 190);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2850, 165);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3050, 140);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3250, 165);
+    gameEngine.addEntity(block);
+    blocks.push(block);
 
-    //TUNNEL
-    npf = new NewPlatform(gameEngine, 4150, 190);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
+    //Sky bridge
+    newPlatform = new NewPlatform(gameEngine, 3200, 190);
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
+    newPlatform = new NewPlatform(gameEngine, 3650, 190);
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
 
+    godModePowerup = new GodModePowerup(gameEngine, 4800, 275);
+    gameEngine.addEntity(godModePowerup);
+    godModePowerups.push(godModePowerup);
 
-    npf = new NewPlatform(gameEngine, 4600, 190);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
+    spike = new Spike(gameEngine, 5000, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5064, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5128, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5192, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5256, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5320, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5384, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5448, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5512, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5576, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5640, 275);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
 
-    npf = new NewPlatform(gameEngine, 5100, 90);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
+    block = new Block(gameEngine, 6200, 275);
+    gameEngine.addEntity(block);
+    blocks.push(block);
 
-    for(let i = 0; i < 5; i++){
+    checkPoint = new Checkpoint(gameEngine, 6500, 210);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
 
-        spike = new Spike(gameEngine, 5620, 30 - 65 * i);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
+    wall = new Wall(gameEngine, 6900, 210);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
 
-    }
+    sloMoPowerup = new SloMoPowerup(gameEngine, 7200, 275);
+    gameEngine.addEntity(sloMoPowerup);
+    sloMoPowerups.push(sloMoPowerup);
 
-    npf = new NewPlatform(gameEngine, 4900, 250);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
-    npf = new NewPlatform(gameEngine, 5225, 250);
-    gameEngine.addEntity(npf);
-    newPlatforms.push(npf);
+    wall = new Wall(gameEngine, 7400, 210);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
 
+    wall = new Wall(gameEngine, 7800, 210);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
 
-    for(let i = 0; i < 5; i++){
-
-        spike = new Spike(gameEngine, 5810  + 195 * i, 250);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
-        spike = new Spike(gameEngine, 5810  + 195 * i, -100);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);   
-        blk = new Block(gameEngine, 5875 + 195 * i, 250);
-        gameEngine.addEntity(blk);
-        blocks.push(blk);
-        blk = new Block(gameEngine, 5940 + 195 * i, 250);
-        gameEngine.addEntity(blk);
-        blocks.push(blk);
-
-    } 
-
-    for(let i = 0; i < 5; i++){
-
-        spike = new Spike(gameEngine, 6800  + 135 * i, 250);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);
-        spike = new Spike(gameEngine, 6800  + 135 * i, -100);
-        gameEngine.addEntity(spike);
-        spikes.push(spike);   
-        blk = new Block(gameEngine, 6865 + 135 * i, 250);
-        gameEngine.addEntity(blk);
-        blocks.push(blk);
-    
-    } 
-
-
-    blk = new Block(gameEngine, 7470, 250);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 7535, 250);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-
-    // for(let i = 0; i < 10; i++){
-
-    //     spike = new Spike(gameEngine, 7600  + 65 * i, 300);
-    //     gameEngine.addEntity(spike);
-    //     spikes.push(spike);
-    
-    // } 
-
-    fl = new FinishLine(gameEngine, 7600, 100);
-    gameEngine.addEntity(fl);
-    finishLines.push(fl);
-
-    //GROUND
-    currentPlatform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);    
-
+    finishLine = new FinishLine(gameEngine, 8300, 100);
+    gameEngine.addEntity(finishLine);
+    finishLines.push(finishLine);
 }
 
 // the "main" code begins here
@@ -1440,7 +1346,6 @@ ASSET_MANAGER.queueDownload("./img/rocketship.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
-    console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
     document.getElementById('gameWorld').focus();
     var ctx = canvas.getContext('2d');
@@ -1482,20 +1387,8 @@ ASSET_MANAGER.downloadAll(function () {
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
     gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));    
-
-    let speedPowerup = new SpeedPowerup(gameEngine, 7500, 190);
-    gameEngine.addEntity(speedPowerup);
-    speedPowerups.push(speedPowerup);
-
-    let sloMoPowerup = new SloMoPowerup(gameEngine, 750, 190);
-    gameEngine.addEntity(sloMoPowerup);
-    sloMoPowerups.push(sloMoPowerup);
-
-    let godModePowerup = new GodModePowerup(gameEngine, 7500, 190);
-    gameEngine.addEntity(godModePowerup);
-    godModePowerups.push(godModePowerup);
-
-    createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, gameEngine);
+    
+    createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine);
 
     gameEngine.addEntity(new Character(gameEngine)); 
     gameEngine.addEntity(new Credits(gameEngine));
