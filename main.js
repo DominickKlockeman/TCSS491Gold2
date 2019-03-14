@@ -1,3 +1,12 @@
+//
+//  ADD FIELD TO EVERY ENTITY TO ONLY DISPLAY WHEN GAME.LEVEL1 IS CALLED. ADD FIELD IN GAME ENGINE
+//  THAT HANDLES WHICH ONE. SO WHEN THAT MENU ITEM IS CLICKED. SEND GAMEENGINE.MAP TO 1, 2, OR 3.
+//  THEN IN EACH ENTITY'S DRAW, DO, (GAME.RUNNING && THIS.MAPNUM == GAME.MAPNUM). IN EACH CREATE MAP
+//  FUNCTION ADD EACH NUMBER THAT CORRESPONDS TO EACH MAP. SO WHENEVER A NEW ENTITY CALLED, SET THAT 
+//  ENTITY'S MAP FIELD. SHOULD WORK. GOOD JOB DOMI.
+//
+/////////////////////////////////////////
+
 var menuSelectSound = new Audio("MeleeMenuSelect Sound.mp3");
 var gameBackgroundSound = new Audio("gameMusic.mp3");
 
@@ -175,65 +184,8 @@ BoundingBox.prototype.collide = function (other) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function RocketShip(game, x, y) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/rocketship.png"), 0, 0, 100, 105, 0.2, 0, true, false);
-    this.startX = x;
-    this.startY = y;
-    this.boundingbox = new BoundingBox(this.x, this.y, 64, 10000);
-    Entity.call(this, game, x , y);
-}
 
-RocketShip.prototype = new Entity();
-RocketShip.prototype.constructor = RocketShip;
-
-RocketShip.prototype.update = function() {
-    if(!this.game.running) {
-        return;
-    }
-    Entity.prototype.update.call(this);
-}
-
-RocketShip.prototype.draw = function() {
-    if(this.game.running) {
-        //this.animation.drawFrame(this.game.clockTick, ctx, this,x, this.y, 0);
-    }
-    Entity.prototype.draw.call(this);
-}
-
-
-/*
-
-Spike.prototype.update = function () {
-    if (!this.game.running) {
-        return;    
-    }
-    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    this.x -= 200 * this.game.clockTick;
-    Entity.prototype.update.call(this);
-}
-
-Spike.prototype.draw = function (ctx) {
-    if (this.game.running) {
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-    }
-    Entity.prototype.draw.call(this);
-}
-
-
-
-
-*/
-
-
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
-
-
-HandleClicks = function(game, startX, endX, startY, endY, func) {
+HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
     if(game.click != null && game.click.x >= startX &&
         game.click.x <= endX && game.click.y >= startY &&
         game.click.y <= endY) {
@@ -241,21 +193,17 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
             game.song.play();
             game.inmenus = true;
             if(func == "single"){
-                console.log("here");
-                game.canbepaused = true;
-                game.song.pause();
-                game.inmenus = false;
-                game.running = true;
-                game.song = gameBackgroundSound;
-                game.actualTime.gameTime = 0;
+                game.levelselection = true;
+                game.mainmenu = false;
             } else if(func == "multi") {
-                //game.inmenus = false;
-                game.actualTime.gameTime = 0;
-                game.multi = true;
-                //game.mainmenu = false;
+                // game.inmenus = false;
+                // game.actualTime.gameTime = 0;
+                // game.multi = true;
+                // game.mainmenu = false;
             } else if(func == "naked") {
                 game.naked = true; 
-                //game.mainmenu = false;
+                game.levelselection = true;
+                game.mainmenu = false;
             } else if(func == "controls") {
                 game.controls = true;
                 game.mainmenu = false;
@@ -263,22 +211,134 @@ HandleClicks = function(game, startX, endX, startY, endY, func) {
                 game.credits = true; 
                 game.mainmenu = false;
             } else if(func == "credits back") {
+                game.song.pause();
+                game.song = menuBackgroundSound;
                 game.credits = false;
                 game.controls = false;
                 game.leaderboard = false;
+                game.naked = false;
+                game.inmenus = true;
                 game.mainmenu = true; 
+                game.running = false;
+                game.alive = true;
+                game.reset(0);
+                game.character.y = 270;
+                game.character.cpY = 270;
+                game.firstCp = false;
             } else if(func == "leaderboard") {
                 game.leaderboard = true; 
                 game.mainmenu = false;
             } else if(func == "end game main menu") {
                 game.song.pause();
                 game.alive = true;
-                game.mainmenu = true;
                 game.song = menuBackgroundSound;
-            } else if(func == "player finished") {
-                game.playerFinished = true;
-            }
+                game.credits = false;
+                game.controls = false;
+                game.leaderboard = false;
+                game.naked = false;
+                game.inmenus = true;
+                game.mainmenu = true; 
+                game.finishLevel = false;
+                game.reset(0);
+                game.character.y = 270;
+                game.character.cpY = 270;
+                game.firstCp = false;
+            } else if(func == "map 1") {
+                SelectMap(game, 1);
+            } else if(func == "map 2") {
+                SelectMap(game, 2);
+            } else if(func == "map 3") {
+                SelectMap(game, 3);
+            } 
         }
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+SelectMap = function(game, map) {
+    if(map == 1) {
+        game.blocks = game.blocks1;
+        game.spikes = game.spikes1;
+        game.walls = game.walls1;
+        game.newPlatforms = game.newPlatforms1;
+        game.platforms = game.platforms1;
+        if(game.naked) {
+            var blank1 = [];
+            var blank2 = [];
+            var blank3 = [];
+            game.sloMoPowerups = blank1;
+            game.speedPowerups = blank2; 
+            game.godModePowerups = blank3;
+        } else {
+            game.speedPowerups = game.speedPowerups1;
+            game.sloMoPowerups = game.sloMoPowerups1;
+            game.godModePowerups = game.godModePowerups1;
+        }
+        game.finishLines = game.finishLines1;
+        game.checkpoints = game.checkpoints1;
+        game.character.platform = game.platforms1[0];
+        game.map = 1;
+
+    } else if(map == 2) {
+        game.blocks = game.blocks2;
+        game.spikes = game.spikes2;
+        game.walls = game.walls2;
+        game.newPlatforms = game.newPlatforms2;
+        game.platforms = game.platforms2;
+        if(game.naked) {
+            var blank1 = [];
+            var blank2 = [];
+            var blank3 = [];
+            game.sloMoPowerups = blank1;
+            game.speedPowerups = blank2; 
+            game.godModePowerups = blank3;
+        } else {
+            game.speedPowerups = game.speedPowerups2;
+            game.sloMoPowerups = game.sloMoPowerups2;
+            game.godModePowerups = game.godModePowerups2;
+        }
+        
+        game.finishLines = game.finishLines2;
+        game.checkpoints = game.checkpoints2;
+        game.character.platform = game.platforms2[0];
+        game.map = 2;
+
+    } else if(map == 3) {
+        game.blocks = game.blocks3;
+        game.spikes = game.spikes3;
+        game.walls = game.walls3;
+        game.newPlatforms = game.newPlatforms3;
+        game.platforms = game.platforms3;
+        if(game.naked) {
+            var blank1 = [];
+            var blank2 = [];
+            var blank3 = [];
+            game.sloMoPowerups = blank1;
+            game.speedPowerups = blank2; 
+            game.godModePowerups = blank3;
+        } else {
+            ame.speedPowerups = game.speedPowerups3;
+            game.sloMoPowerups = game.sloMoPowerups3;
+            game.godModePowerups = game.godModePowerups3;
+        }
+        g
+        game.finishLines = game.finishLines3;
+        game.checkpoints = game.checkpoints3;
+        game.character.platform = game.platforms3[0];
+        game.map = 3;
+
+    }
+    game.canbepaused = true;
+    game.song.pause();
+    game.inmenus = false;
+    game.running = true;
+    game.song = gameBackgroundSound;
+    game.actualTime.gameTime = 0;
+    game.finishLevel = false;
+    game.levelselection = false;
+
 }
 
 /******************************************************************************************/
@@ -316,6 +376,15 @@ HighlightSelection = function(ctx, game, startX, endX, startY, endY, func) {
 
             } else if(func == "end game main menu") {
                 ctx.fillText("Return to Main Menu", 250, 300);
+
+            } else if(func == "map 1") {
+                ctx.fillText("Level 1", 350, 200);
+
+            } else if(func == "map 2") {
+                ctx.fillText("Level 2", 350, 250);
+
+            } else if(func == "map 3") {
+                ctx.fillText("Level 3", 350, 300);
             }
         }
 }
@@ -323,21 +392,17 @@ HighlightSelection = function(ctx, game, startX, endX, startY, endY, func) {
 ReturnToMainMenu = function(ctx, game) {
     ctx.font = "25pt Impact";
     ctx.fillText("Return to Main Menu", 480, 480);
-    HandleClicks(game, 480, 760, 455, 485, "credits back");
+    HandleClicks(ctx, game, 480, 760, 455, 485, "credits back");
     HighlightSelection(ctx, game, 480, 760, 455, 485, "credits back");
 } 
 
-
-
-
-
 function HandleMainMenuClicks(ctx, game) {
-    HandleClicks(game, 300, 519, 115, 151, "single");
-    HandleClicks(game, 310, 508, 170, 204, "multi");
-    HandleClicks(game, 350, 454, 220, 251, "naked");
-    HandleClicks(game, 330, 471, 273, 304, "controls");
-    HandleClicks(game, 340, 461, 371, 405, "credits");
-    HandleClicks(game, 302, 508, 321, 351, "leaderboard");
+    HandleClicks(ctx, game, 300, 519, 115, 151, "single");
+    HandleClicks(ctx, game, 310, 508, 170, 204, "multi");
+    HandleClicks(ctx, game, 350, 454, 220, 251, "naked");
+    HandleClicks(ctx, game, 330, 471, 273, 304, "controls");
+    HandleClicks(ctx, game, 340, 461, 371, 405, "credits");
+    HandleClicks(ctx, game, 302, 508, 321, 351, "leaderboard");
     HighlightSelection(ctx, game, 300, 519, 115, 151, "single");
     HighlightSelection(ctx, game, 310, 530, 170, 204, "multi");
     HighlightSelection(ctx, game, 350, 454, 220, 251, "naked");
@@ -381,7 +446,7 @@ function FillVolume(num, vol, ctx) {
 
 }
 
-function DisplayVolume(ctx, game, ctx) {
+function DisplayVolume(ctx, game) {
     ctx.fillStyle = "yellow"; 
     FillVolume(5, "true", ctx);
     if(game.volume == 0) {
@@ -476,16 +541,13 @@ function HighlightVolumeSelection(ctx, game, startX, endX, startY, endY, func) {
 }
 
 function displayControls(ctx) {
-    ctx.fillText("W:  Jump", 300, 100);
-    ctx.fillText("P : pause", 300, 150);
-    ctx.fillText("Select bars to adjust Volume", 150, 200);
-    ctx.fillText("Select Volume to mute", 200, 250);
-    ctx.fillText("Avoid Spikes", 280, 300);
-    ctx.fillText("Get to your spaceship", 200, 350);
-}
-
-function endGame(ctx, game) {
-
+    ctx.fillText("W:  Jump", 325, 70);
+    ctx.fillText("P : Pause", 325, 120);
+    ctx.fillText("Space: Laser", 295, 170);
+    ctx.fillText("Select bars to adjust volume", 180, 220);
+    ctx.fillText("Select volume to mute", 225, 270);
+    ctx.fillText("Avoid spikes", 295, 320);
+    ctx.fillText("Shoot down walls with laser", 175, 370);
 }
 
 /******************************************************************************************/
@@ -501,7 +563,10 @@ PlayGame.prototype = new Entity();
 PlayGame.prototype.constructor = PlayGame;
 
 PlayGame.prototype.reset = function () {
-    this.game.running = false;
+    if(this.game.finishLevel) {
+        this.game.running = false;
+
+    }
 }
 PlayGame.prototype.update = function () {
     
@@ -511,24 +576,18 @@ PlayGame.prototype.draw = function (ctx) {
     this.game.song.pause();
     ctx.font = "30pt Impact";
     ctx.fillStyle = "yellow";
-    DisplayVolume(ctx, this.game, ctx, this.game.volume);
+    DisplayVolume(ctx, this.game);
     this.game.song.play();
     if (!this.game.running) {
         ctx.fillStyle = "yellow";
-        if(!this.game.alive) {
+        if(this.game.finishLevel) {
             this.game.canbepaused = false;
-            ctx.fillText("Game Over", 315, 200);
-            ctx.fillText("Replay", 346, 250);
+            ctx.fillText("You Win!", 330, 200);
             ctx.fillText("Return to Main Menu", 250, 300);
-            HandleClicks(this.game, 346, 480, 220, 255, "single");
-            HighlightSelection(ctx, this.game, 346, 480, 220, 255, "dead");
-            HandleClicks(this.game, 253, 587, 270, 302, "end game main menu");
+            HandleClicks(ctx, this.game, 253, 587, 270, 302, "end game main menu");
             HighlightSelection(ctx, this.game, 253, 587, 270, 302, "end game main menu");
             
-        } else if (this.game.credits) {
-            ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.mainmenu && !this.game.playerFinished){
-            console.log("menu here");
+        } else if(this.game.mainmenu){
             ctx.font = "50pt Impact";
             ctx.fillText("Space Death Race", 150, 70);
             ctx.font = "30pt Impact";
@@ -543,19 +602,28 @@ PlayGame.prototype.draw = function (ctx) {
         } else if (this.game.controls) {
             displayControls(ctx);
             ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.naked) {
-            ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.leaderboard) {
+        }  else if(this.game.leaderboard) {
             ctx.fillText("Dominick       20.001", 250, 100);
             ctx.fillText("Allen                 18.345", 250, 150);
             ctx.fillText("Giovanni         15.790", 250, 200);
             ctx.fillText("Andrew             2.999", 250, 250);
             ReturnToMainMenu(ctx, this.game);
-        } else if(this.game.playerFinished) {
-            ctx.fillText("Congratulations!", 260, 200);
-            ctx.fillText("You made it to the spaceship in time!", 110, 250);
+        } else if(this.game.levelselection) {
+            ctx.fillText("Level 1", 350, 200);
+            ctx.fillText("Level 2", 350, 250);
+            ctx.fillText("Level 3", 350, 300);
+            HandleClicks(ctx, this.game, 353, 459, 172, 205, "map 1");
+            HandleClicks(ctx, this.game, 353, 459, 222, 255, "map 2");
+            HandleClicks(ctx, this.game, 353, 459, 272, 305, "map 3");
+            HighlightSelection(ctx, this.game, 353, 459, 172, 205, "map 1");
+            HighlightSelection(ctx, this.game, 353, 459, 222, 255, "map 2");
+            HighlightSelection(ctx, this.game, 353, 459, 272, 305, "map 3");
+            ctx.fillStyle = "yellow";
             ReturnToMainMenu(ctx, this.game);
         }
+    } else {
+        ctx.fillStyle = "yellow";
+        ReturnToMainMenu(ctx, this.game);
     }
 }
 
@@ -574,11 +642,11 @@ function Character(game) {
     this.falling = false;
     this.dead = false;
     this.height = 0;
+    this.cpY = 270;
+    this.cpX = 0;
     game.alive = !this.dead;
     this.ground = 350;
     this.platform = game.platforms[0];
-    this.levelX = 10200;
-    console.log('CUBE: ' + this.animation.frameWidth, this.animation.frameHeight);
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
 }
@@ -589,20 +657,18 @@ Character.prototype.constructor = Character;
 Character.prototype.update = function () {
     if (this.game.running) {
         if (this.dead) {
-            this.game.alive = false;
-            this.game.reset();
-            console.log("reset");
+            this.game.alive = false; 
+            this.game.reset(this.cpX);
             return;
         }
         if (this.game.w && !this.falling && !this.jumping) {
             this.jumping = true;
             this.ground = this.y;            
         }
-        if (this.game.space) {
+        if (this.game.space && !this.jumping && !this.falling) {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.laser.boundingbox.collide(wl.boundingbox)) {
-                    console.log("shot the wall");
                     wl.shot = true;
                  
                 }
@@ -632,7 +698,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentPlatform.boundingbox) 
                 && this.lastBottom <= currentPlatform.boundingbox.top
                 && currentPlatform instanceof Platform) {
-                    console.log("shouldve jumped onto platform");
                     this.jumping = false;
                     this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentPlatform;
@@ -644,7 +709,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentBlock.boundingbox) 
                 && this.lastBottom <= currentBlock.boundingbox.top
                 && currentBlock instanceof Block) {
-                    console.log("shouldve jumped onto block");
                     this.jumping = false;
                     this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentBlock;
@@ -656,7 +720,6 @@ Character.prototype.update = function () {
                 if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
                 && this.lastBottom <= currentNewPlatform.boundingbox.top
                 && currentNewPlatform instanceof NewPlatform) {
-                    console.log("shouldve jumped onto new platform");
                     this.jumping = false;
                     this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = currentNewPlatform;
@@ -665,7 +728,6 @@ Character.prototype.update = function () {
             }               
         }
         if (this.falling) {
-            console.log("falling");
             this.lastBottom = this.boundingbox.bottom;
             this.y += 15;
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
@@ -674,7 +736,6 @@ Character.prototype.update = function () {
                 let pf = this.game.platforms[i];
                 if (this.boundingbox.collide(pf.boundingbox) 
                 && this.lastBottom <= pf.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = pf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = pf;
@@ -684,7 +745,6 @@ Character.prototype.update = function () {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox) 
                 && this.lastBottom <= blk.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = blk.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = blk;
@@ -694,7 +754,6 @@ Character.prototype.update = function () {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox) 
                 && this.lastBottom <= npf.boundingbox.top) {
-                    console.log("landed on another platform");
                     this.falling = false;
                     this.y = npf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = npf;
@@ -706,9 +765,7 @@ Character.prototype.update = function () {
         if (!this.jumping && !this.falling) {
             this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
             if (this.boundingbox.left > this.platform.boundingbox.right) {
-                this.falling = true;
-                console.log("should fall");
-            }
+                this.falling = true;            }
         }
         this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 
@@ -724,7 +781,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.spikes.length; i++) {
                 let spk = this.game.spikes[i];
                 if (this.boundingbox.collide(spk.boundingbox)) {
-                    console.log("hit spike")
                     this.dead = true;
                 }
             }
@@ -732,7 +788,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.blocks.length; i++) {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox)) {
-                    console.log("hit block")
                     this.dead = true;
                 }
             }
@@ -740,7 +795,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.newPlatforms.length; i++) {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox)) {
-                    console.log("hit new pf")
                     this.dead = true;
                 }
             }
@@ -748,7 +802,6 @@ Character.prototype.update = function () {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.boundingbox.collide(wl.boundingbox)) {
-                    console.log("hit wall")
                     this.dead = true;
                 }
             }
@@ -781,22 +834,32 @@ Character.prototype.update = function () {
             }
         }
 
-        this.levelX -= this.game.gameSpeed * this.game.clockTick;
-        console.log(this.levelX);
-
-        if(this.levelX < 0){
-        
-            console.log("YOU WIN");
-            
-            this.game.running = false;
-            this.game.playerFinished = true;
-
-            return;
-        
+        for (let i = 0; i < this.game.checkpoints.length; i++) {
+            let cp = this.game.checkpoints[i];
+            if (this.boundingbox.collide(cp.boundingbox)) {
+                cp.animation = cp.activatedCp;
+                this.cpX = cp.startX;
+                this.cpY = cp.startY;
+            }
         }
-                
 
-    
+        for (let i = 0; i < this.game.finishLines.length; i++) {
+            let fl = this.game.finishLines[i];
+            if (this.boundingbox.collide(fl.boundingbox)) {
+                for (let j = 0; j < this.game.checkpoints.length; j++) {
+                    let cp = this.game.checkpoints[j]
+                    cp.animation = cp.unactivatedCp;
+                }
+                this.cpX = 0;
+                this.cpY = 310;
+                this.game.finishLevel = true;
+                this.dead = true;
+            }
+        }
+
+        
+
+
     }
     Entity.prototype.update.call(this);
 }
@@ -820,26 +883,24 @@ Character.prototype.draw = function (ctx) {
                 }
             }
         }
-        
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "blue";
-        //ctx.strokeRect(this.laser.x + 400, this.laser.y - 20, this.laser.width, this.laser.height);
-        // this.boundingbox = new BoundingBox(x, y + 64, this.width, this.height);
+
         Entity.prototype.draw.call(this);
     }
 }
 Character.prototype.reset = function() {
     this.dead = false;
-    this.x = 32;
-    this.y = 270;
     this.ground = 350;
     this.jumping = false;
-    this.falling = false;
-    this.levelX = 10200;
+    this.falling = true;
+    this.animation = cubeSlideBeginning;
     this.jumpAnimation.elapsedTime = 0;
+    this.x = 32;
+    if (this.cpX) {
+        this.y = this.cpY + 50;
+    } else {
+        this.y = 270;
+    }
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
 function Laser(game, cube) {
@@ -847,7 +908,6 @@ function Laser(game, cube) {
     this.animation = laser;
     this.cube = cube;
     this.game = game;
-    //ctx.strokeRect(136, this.y + 90, 64 * 4 , 32);
     this.boundingbox = new BoundingBox(136, this.cube.y + 90, 64 * 4, 32);
     Entity.call(this, game, 0, 0);
 }
@@ -856,7 +916,6 @@ Laser.prototype = new Entity();
 Laser.prototype.constructor = Laser;
 
 Laser.prototype.update = function () {
-    //function BoundingBox(x, y, width, height) {
     this.boundingbox = new BoundingBox(136, this.cube.y + 90, 64 * 4, 32);
     Entity.prototype.update.call(this);
 }
@@ -866,9 +925,7 @@ Laser.prototype.draw = function (ctx) {
         if (this.cube.dead) {
             return
         }
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(136, this.cube.y + 90, 64 * 4 , 32);
+
     }
     
 }
@@ -896,32 +953,6 @@ Credits.prototype.draw = function(ctx) {
     }
     Entity.prototype.draw.call(this);
 }
-
-/******************************************************************************************/
-/******************************************************************************************/
-/******************************************************************************************/
-
-
-/*function SloMo(game, x, y, gnd) {
-    this.ground = gnd;
-    this.x = x;
-    this.y = y;
-    this.boundingbox = new BoundingBox(this.x);
-    Entity.call(this, game, 200, 100);
-}
-
-SloMo.prototype = new Entity();
-SloMo.prototype.constructor = SlowMo;
-
-SloMo.prototype.update = function() {
-
-}
-
-SloMo.prototype.draw = function() {
-
-}
-
-
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -956,7 +987,6 @@ Platform.prototype.update = function () {
 }
 
 Platform.prototype.draw = function (ctx) {
-    // this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
 }
@@ -964,10 +994,11 @@ Platform.prototype.draw = function (ctx) {
 /******************************************************************************************/
 /******************************************************************************************/
 
-function Spike(game, x, y) {
+function Spike(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/spike.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
@@ -976,8 +1007,8 @@ Spike.prototype = new Entity();
 Spike.prototype.constructor = Spike;
 
 
-Spike.prototype.reset = function() {
-    this.x = this.startX;
+Spike.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
@@ -992,19 +1023,17 @@ Spike.prototype.update = function () {
 }
 
 Spike.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
     }
     Entity.prototype.draw.call(this);
 }
 
-function Block(game, x, y) {
+function Block(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/block.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
@@ -1013,8 +1042,8 @@ Block.prototype = new Entity();
 Block.prototype.constructor = Block;
 
 
-Block.prototype.reset = function() {
-    this.x = this.startX;
+Block.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
@@ -1029,19 +1058,17 @@ Block.prototype.update = function () {
 }
 
 Block.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y + 64, 64, 64);
     }
     Entity.prototype.draw.call(this);
 }
 
-function NewPlatform(game, x, y) {
+function NewPlatform(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/platform.png"), 0, 0, 320, 64, 0.5, 2, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.boundingbox = new BoundingBox(this.x + 314, this.y, 330, 64);
     Entity.call(this, game, x , y);
 }
@@ -1050,8 +1077,8 @@ NewPlatform.prototype = new Entity();
 NewPlatform.prototype.constructor = NewPlatform;
 
 
-NewPlatform.prototype.reset = function() {
-    this.x = this.startX;
+NewPlatform.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 314, this.y + 64, 330, 64);
 }
@@ -1066,21 +1093,20 @@ NewPlatform.prototype.update = function () {
 }
 
 NewPlatform.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 1;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 314, this.y + 64, 330, 64);
+
     }
     Entity.prototype.draw.call(this);
 }
 
-function SpeedPowerup(game, x, y) {
+function SpeedPowerup(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
 
@@ -1088,10 +1114,10 @@ SpeedPowerup.prototype = new Entity();
 SpeedPowerup.prototype.constructor = SpeedPowerup;
 
 
-SpeedPowerup.prototype.reset = function() {
-    this.x = this.startX;
+SpeedPowerup.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
 SpeedPowerup.prototype.update = function () {
@@ -1099,29 +1125,25 @@ SpeedPowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 SpeedPowerup.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
 
-function SloMoPowerup(game, x, y) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
+function SloMoPowerup(game, x, y, map) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/slow.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
 
@@ -1129,10 +1151,10 @@ SloMoPowerup.prototype = new Entity();
 SloMoPowerup.prototype.constructor = SloMoPowerup;
 
 
-SloMoPowerup.prototype.reset = function() {
-    this.x = this.startX;
+SloMoPowerup.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
 SloMoPowerup.prototype.update = function () {
@@ -1140,29 +1162,25 @@ SloMoPowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 SloMoPowerup.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
 
-function GodModePowerup(game, x, y) {
+function GodModePowerup(game, x, y, map) {
     this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.isHit = false;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x, this.y, 64, 64);
     Entity.call(this, game, x , y);
 }
 
@@ -1170,10 +1188,10 @@ GodModePowerup.prototype = new Entity();
 GodModePowerup.prototype.constructor = GodModePowerup;
 
 
-GodModePowerup.prototype.reset = function() {
-    this.x = this.startX;
+GodModePowerup.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
 
 GodModePowerup.prototype.update = function () {
@@ -1181,26 +1199,20 @@ GodModePowerup.prototype.update = function () {
         return;    
     }
 
-   // console.log("Coin is : " + this.isHit);
-
-    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 64);
+    this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     this.x -= this.game.gameSpeed  * this.game.clockTick;
     Entity.prototype.update.call(this);
 }
 
 GodModePowerup.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 64, this.y, 64, 192);
     }
     Entity.prototype.draw.call(this);
 }
 
 
-function Wall(game, x, y) {
-    //function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDuration, frames, loop, reverse) {
+function Wall(game, x, y, map) {
     defaultAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall.png"), 0, 0, 64, 64, 0.5, 2, true, false);
     fallingAnimation = new Animation(ASSET_MANAGER.getAsset("./img/wall_lowered.png"), 0, 0, 64, 64, 0.025, 12, false, false);
     
@@ -1208,6 +1220,7 @@ function Wall(game, x, y) {
     this.shot = false;
     this.startX = x;
     this.startY = y;
+    this.map = map;
     this.dead = false;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
     Entity.call(this, game, x , y);
@@ -1217,8 +1230,8 @@ Wall.prototype = new Entity();
 Wall.prototype.constructor = Wall;
 
 
-Wall.prototype.reset = function() {
-    this.x = this.startX;
+Wall.prototype.reset = function(cpX) {
+    this.x = this.startX - cpX + 32;
     this.y = this.startY;
     this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
     this.shot = false;
@@ -1242,7 +1255,7 @@ Wall.prototype.update = function () {
 }
 
 Wall.prototype.draw = function (ctx) {
-    if (this.game.running) {
+    if (this.game.running && (this.map == this.game.map)) {
        if (!this.dead) {
             if (this.shot) {
                 if (fallingAnimation.isDone()) {
@@ -1251,414 +1264,427 @@ Wall.prototype.draw = function (ctx) {
                     return;
                 }
                 this.animation = fallingAnimation;
-                console.log("falling");
+
             }
             this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-            //console.log("drawing");
-            // ctx.lineWidth = 3;
-            // ctx.strokeStyle = "blue";
-            // ctx.strokeRect(this.x + 64, this.y, 64, 192);
         
         }
     }
     Entity.prototype.draw.call(this);
 }
+
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
 
-function createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine) {
+function Checkpoint(game, x, y, map) {
+    this.unactivatedCp = new Animation(ASSET_MANAGER.getAsset("./img/checkpoint.png"), 0, 0, 64, 64, 0.5, 2, true, false);
+    this.activatedCp = new Animation(ASSET_MANAGER.getAsset("./img/checkpoint_activated.png"), 0, 0, 64, 64, 0.5, 2, true, false); 
+    this.animation = this.unactivatedCp;
+    this.startX = x;
+    this.startY = y;
+    this.map = map;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+    Entity.call(this, game, x, y);
+}
 
-    // let spike;
-    // let block;
-    // let wall;
-    // let newPlatform;
+Checkpoint.prototype = new Entity();
+Checkpoint.prototype.constructor = Checkpoint;
 
-    let spike;
-    let start;
-    let currentPlatform
-    let w;
+Checkpoint.prototype.reset = function (cpX) {
+    this.x = this.startX - cpX + 32;
+    this.y = this.startY;
+    this.boundingbox = new BoundingBox(this.x + 64, this.y, 64, 192);
+}
 
-    w = new Wall(gameEngine, 545, 210);
+Checkpoint.prototype.update = function () {
+    if (!this.game.running || this.boundingbox.right < 0) {
+        return;
+    }
+    if (this.game.checkpoints[0] == this) {
+        this.game.firstCp = true;
+    }
+    this.boundingbox = new BoundingBox(this.x + 64, -1000, 64, 2000); 
+    this.x -= this.game.gameSpeed * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+Checkpoint.prototype.draw = function (ctx) {
+    if (this.game.running && (this.map == this.game.map)) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+function FinishLine(game, x, y, map) {
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/finish_line.png"), 0, 0, 64, 64, 0.5, 2, true, false); 
+    this.startX = x;
+    this.startY = y;
+    this.map = map;
+    this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500);
+    Entity.call(this, game, x, y);
+}
+
+FinishLine.prototype = new Entity();
+FinishLine.prototype.constructor = FinishLine;
+
+FinishLine.prototype.reset = function (cpX) {
+    this.x = this.startX - cpX + 32;
+    this.y = this.startY;
+    this.boundingbox = new BoundingBox(this.x + 400, -1000, 64, 2000);
+}
+
+FinishLine.prototype.update = function () {
+    if (!this.game.running || this.boundingbox.right < 0) {
+        return;
+    }
+    this.boundingbox = new BoundingBox(this.x + 400, this.y, 64, 500); 
+    this.x -= this.game.gameSpeed * this.game.clockTick;
+    Entity.prototype.update.call(this);
+}
+
+FinishLine.prototype.draw = function (ctx) {
+    if (this.game.running && (this.map == this.game.map)) {
+        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 10);
+    }
+    Entity.prototype.draw.call(this);
+}
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+function createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
+    let platform, spike, block, newPlatform, wall, checkPoint, finishLine, speedPowerup, sloMoPowerup, godModePowerup;
+    
+    //GROUND
+    platform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
+    gameEngine.addEntity(platform);
+    platforms.push(platform);    
+
+    block = new Block(gameEngine, 450, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    block = new Block(gameEngine, 750, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 814, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    checkPoint = new Checkpoint(gameEngine, 930, 210, 1);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
+
+    speedPowerup = new SpeedPowerup(gameEngine, 1100, 275, 1);
+    gameEngine.addEntity(speedPowerup);
+    speedPowerups.push(speedPowerup);
+
+    spike = new Spike(gameEngine, 1700, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    //UPSTAIRS
+    block = new Block(gameEngine, 2500, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2650, 190, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 2850, 165, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3050, 140, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+    block = new Block(gameEngine, 3250, 165, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    //Sky bridge
+    newPlatform = new NewPlatform(gameEngine, 3200, 190, 1);
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
+    newPlatform = new NewPlatform(gameEngine, 3650, 190), 1;
+    gameEngine.addEntity(newPlatform);
+    newPlatforms.push(newPlatform);
+
+    godModePowerup = new GodModePowerup(gameEngine, 4800, 275, 1);
+    gameEngine.addEntity(godModePowerup);
+    godModePowerups.push(godModePowerup);
+
+    spike = new Spike(gameEngine, 5000, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5064, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5128, 275), 1;
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5192, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5256, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5320, 275), 1;
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5384, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5448, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5512, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5576, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 5640, 275, 1);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+    block = new Block(gameEngine, 6200, 275, 1);
+    gameEngine.addEntity(block);
+    blocks.push(block);
+
+    checkPoint = new Checkpoint(gameEngine, 6500, 210, 1);
+    gameEngine.addEntity(checkPoint);
+    checkpoints.push(checkPoint);
+
+    wall = new Wall(gameEngine, 6900, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    sloMoPowerup = new SloMoPowerup(gameEngine, 7200, 275, 1);
+    gameEngine.addEntity(sloMoPowerup);
+    sloMoPowerups.push(sloMoPowerup);
+
+    wall = new Wall(gameEngine, 7400, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    wall = new Wall(gameEngine, 7800, 210, 1);
+    gameEngine.addEntity(wall);
+    walls.push(wall);
+
+    finishLine = new FinishLine(gameEngine, 8300, 100, 1);
+    gameEngine.addEntity(finishLine);
+    finishLines.push(finishLine);
+}
+
+
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+
+function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
+
+
+    w = new Wall(gameEngine, 530, 210, 2);
     gameEngine.addEntity(w);
     walls.push(w);
 
 
-
-    //UP STAIRS
-    // pf = new Platform(gameEngine, 800, 325, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-    // pf = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
-    // gameEngine.addEntity(pf);
-    // platforms.push(pf);
-
-    blk = new Block(gameEngine, 800, 275);
+    // STAIRS 
+    blk = new Block(gameEngine, 800, 275, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1000, 250);
+    blk = new Block(gameEngine, 1000, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1200, 225);
+    blk = new Block(gameEngine, 1200, 225, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
-    blk = new Block(gameEngine, 1400, 200);
+    blk = new Block(gameEngine, 1400, 200, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
     /*
     *Spikes in tunnel
     */
-   for (var i = 0; i < 4; i++) { 
-       spike = new Spike(gameEngine, 1564 + 64 * i, 0);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-   }
+    for (var i = 0; i < 4; i++) { 
+        spike = new Spike(gameEngine, 1564 + 64 * i, 0, 2);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
 
-   blk = new Block(gameEngine, 1938, 72);
-   gameEngine.addEntity(blk);
-   blocks.push(blk);
-   blk = new Block(gameEngine, 2138, 0);
-   gameEngine.addEntity(blk);
-   blocks.push(blk);
+    blk = new Block(gameEngine, 1938, 72, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 2138, 0, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
 
-   spk = new Spike(gameEngine, 1938, 136);
-   gameEngine.addEntity(spk);
-   spikes.push(spk);
+    spk = new Spike(gameEngine, 1938, 136, 2);
+    gameEngine.addEntity(spk);
+    spikes.push(spk);
 
-   wl = new Wall(gameEngine, 2138, 128);
-   gameEngine.addEntity(wl);
-   walls.push(wl);
-   wl = new Wall(gameEngine, 2138, 308);
-   gameEngine.addEntity(wl);
-   walls.push(wl);
+    wl = new Wall(gameEngine, 2138, 128, 2);
+    gameEngine.addEntity(wl);
+    walls.push(wl);
+    wl = new Wall(gameEngine, 2138, 308, 2);
+    gameEngine.addEntity(wl);
+    walls.push(wl);
+
+    cp = new Checkpoint(gameEngine, 2138, -128, 2);
+    gameEngine.addEntity(cp);
+    checkpoints.push(cp);
 
    
     //Tunnel
-    npf = new NewPlatform(gameEngine, 1300, 200);
+    npf = new NewPlatform(gameEngine, 1300, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1630, 200);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1630, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 1960, 200);
+    newPlatforms.push(npf);
+    // platforms.push(npf);
+    npf = new NewPlatform(gameEngine, 1960, 200, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    // currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
-    // gameEngine.addEntity(currentPlatform);
-    // platforms.push(currentPlatform);
-
-
-
-    /* //UP STAIRS
-    currentPlatform = new Platform(gameEngine, 800, 325, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1000, 300, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1200, 275, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1400, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-    /*
-    *Spikes in tunnel
-    */
-
-   /*start = 1590;
-
-   for(var i = 0; i < 12; i++){
-       
-       start = start + 65;
-       
-
-       spike = new Spike(gameEngine, start , -5);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-
-   }
-
-
-
-    //Tunnel
-    currentPlatform = new Platform(gameEngine, 1600, 200, 800, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 1600, 0, 900, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform); */
+    newPlatforms.push(npf);
 
     /*
     *Spike under stairs
     */
 
-   for (var i = 0; i < 24; i++) {   
-       spike = new Spike(gameEngine, 2636 + 64 * i, 300);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-   }
-    //DOWNSTAIRS
-    // currentBlock = new Block(gameEngine, 2450, 200);
-    // gameEngine.addEntity(currentBlock);
-    // blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 2650, 200);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 2800, 120);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3000, 195);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3200, 180);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-    currentBlock = new Block(gameEngine, 3400, 255);
-    gameEngine.addEntity(currentBlock);
-    blocks.push(currentBlock);
-
-    // spike = new Spike(gameEngine, 2700 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-    // spike = new Spike(gameEngine, 2900 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-    // spike = new Spike(gameEngine, 3100 , -200 , true);
-    // gameEngine.addEntity(spike);
-    // spikes.push(spike);
-
-    //UPSTAIRS
-
-    blk = new Block(gameEngine, 3600, 190);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 3800, 165);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 4000, 140);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-    blk = new Block(gameEngine, 4200, 165);
-    gameEngine.addEntity(blk);
-    blocks.push(blk);
-
-    /*
-    for (let i = 0; i < 4; i++) {
-        spike = new Spike(gameEngine, 4300, 215 + 50 * i);
+    for (var i = 0; i < 24; i++) {   
+        spike = new Spike(gameEngine, 2636 + 64 * i, 300, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
-    } */
+    }
+
+    currentBlock = new Block(gameEngine, 2650, 200, 2);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 2800, 120, 2);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3000, 195, 2);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3200, 180, 2);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+    currentBlock = new Block(gameEngine, 3400, 255, 2);
+    gameEngine.addEntity(currentBlock);
+    blocks.push(currentBlock);
+
+    //UPSTAIRS
+    blk = new Block(gameEngine, 3600, 190, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 3800, 165, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4000, 140, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4200, 165, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
 
     //TUNNEL
-    npf = new NewPlatform(gameEngine, 4150, 190);
+    npf = new NewPlatform(gameEngine, 4150, 190, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
 
-    npf = new NewPlatform(gameEngine, 4600, 190);
+    npf = new NewPlatform(gameEngine, 4600, 190, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
-    npf = new NewPlatform(gameEngine, 5100, 90);
+    npf = new NewPlatform(gameEngine, 5100, 90, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     for(let i = 0; i < 5; i++){
 
-
-    spike = new Spike(gameEngine, 5620, 30 - 65 * i);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-
+        spike = new Spike(gameEngine, 5620, 30 - 65 * i, 2);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
 
     }
 
-
-    npf = new NewPlatform(gameEngine, 4900, 250);
+    npf = new NewPlatform(gameEngine, 4900, 250, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    npf = new NewPlatform(gameEngine, 5225, 250);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 5225, 250, 2);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
+
+    blk = new Block(gameEngine, 5812, 250, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
 
     for(let i = 0; i < 5; i++){
 
-
-        spike = new Spike(gameEngine, 5810  + 195 * i, 250);
+        spike = new Spike(gameEngine, 5875  + 195 * i, 250, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);
-        spike = new Spike(gameEngine, 5810  + 195 * i, -100);
+        spike = new Spike(gameEngine, 5875  + 195 * i, -100, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);   
-        blk = new Block(gameEngine, 5875 + 195 * i, 250);
+        blk = new Block(gameEngine, 5940 + 195 * i, 250), 2;
         gameEngine.addEntity(blk);
         blocks.push(blk);
-        blk = new Block(gameEngine, 5940 + 195 * i, 250);
+        blk = new Block(gameEngine, 6008 + 195 * i, 250, 2);
         gameEngine.addEntity(blk);
         blocks.push(blk);
 
+    } 
+
+    for(let i = 0; i < 5; i++){
+
+        spike = new Spike(gameEngine, 6850  + 135 * i, 250, 2);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+        spike = new Spike(gameEngine, 6850  + 135 * i, -100, 2);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);   
+        blk = new Block(gameEngine, 6920 + 135 * i, 250, 2);
+        gameEngine.addEntity(blk);
+        blocks.push(blk);
     
-    
-    
-        } 
-
-        for(let i = 0; i < 5; i++){
+    } 
 
 
-            spike = new Spike(gameEngine, 6800  + 135 * i, 250);
-            gameEngine.addEntity(spike);
-            spikes.push(spike);
-            spike = new Spike(gameEngine, 6800  + 135 * i, -100);
-            gameEngine.addEntity(spike);
-            spikes.push(spike);   
-            blk = new Block(gameEngine, 6865 + 135 * i, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
-
-            
-        
-        
-        
-            } 
+    blk = new Block(gameEngine, 7525, 250, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7590, 250, 2);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
 
 
-            blk = new Block(gameEngine, 7470, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
-            blk = new Block(gameEngine, 7535, 250);
-            gameEngine.addEntity(blk);
-            blocks.push(blk);
+    fl = new FinishLine(gameEngine, 7600, 100, 2);
+    gameEngine.addEntity(fl);
+    finishLines.push(fl);
 
+    // POWER-UPS 
+    // let speedPowerup = new SpeedPowerup(gameEngine, 7500, 190);
+    // gameEngine.addEntity(speedPowerup);
+    // speedPowerups.push(speedPowerup);
 
-            for(let i = 0; i < 10; i++){
+    let sloMoPowerup = new SloMoPowerup(gameEngine, 2200, 270, 2);
+    gameEngine.addEntity(sloMoPowerup);
+    sloMoPowerups.push(sloMoPowerup);
 
-                spike = new Spike(gameEngine, 7600  + 65 * i, 300);
-                gameEngine.addEntity(spike);
-                spikes.push(spike);
-            
-                } 
-
-
-
-    // blk = new Block(gameEngine, 4500, 40);
-    // gameEngine.addEntity(blk);
-    // blocks.push(blk);
-
-
-  
-  /*
-   start = 2375;
-
-   for(var i = 0; i < 28; i++){
-    
-       start = start + 65;
-       
-
-       spike = new Spike(gameEngine, start ,270);
-       gameEngine.addEntity(spike);
-       spikes.push(spike);
-
-   }
-
-
-    //DOWNSTAIRS
-    currentPlatform = new Platform(gameEngine, 2450, 280, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 2650, 280, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 2800, 200, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3000, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3200, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3400, 275, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-    spike = new Spike(gameEngine, 2700 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 2900 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 3100 , -200 , true);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-    //UPSTAIRS
-
-    currentPlatform = new Platform(gameEngine, 3600, 250, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 3800, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4000, 200, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4200, 225, 50, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-
-
-
-    spike = new Spike(gameEngine, 4300, 150);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 200);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 250);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-    spike = new Spike(gameEngine, 4300, 300);
-    gameEngine.addEntity(spike);
-    spikes.push(spike);
-
-
-
-    //TUNNEL
-
-    currentPlatform = new Platform(gameEngine, 4400, 250, 1000, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform);
-    currentPlatform = new Platform(gameEngine, 4500, 100, 1000, 50, "grey");
-    gameEngine.addEntity(currentPlatform);
-    platforms.push(currentPlatform); */
-
-    // w = new Wall(gameEngine, 5000,-100);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
-
-
-    // w = new Wall(gameEngine, 5000,300);
-    // gameEngine.addEntity(w);
-    // walls.push(w);
+    let godModePowerup = new GodModePowerup(gameEngine, 5760, 190, 2);
+    gameEngine.addEntity(godModePowerup);
+    godModePowerups.push(godModePowerup);
 
     
 
     //GROUND
-    currentPlatform = new Platform(gameEngine, 0, 400, 1000000000000000, 100, "black");
+    currentPlatform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
     gameEngine.addEntity(currentPlatform);
     platforms.push(currentPlatform);    
-
 
 }
 
@@ -1677,82 +1703,112 @@ ASSET_MANAGER.queueDownload("./img/platform.png");
 ASSET_MANAGER.queueDownload("./img/wall.png");
 ASSET_MANAGER.queueDownload("./img/wall_lowered.png");
 ASSET_MANAGER.queueDownload("./img/spike.png");
+ASSET_MANAGER.queueDownload("./img/checkpoint.png");
+ASSET_MANAGER.queueDownload("./img/checkpoint_activated.png");
 ASSET_MANAGER.queueDownload("./img/credits.png");
 ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
+ASSET_MANAGER.queueDownload("./img/finish_line.png");
 ASSET_MANAGER.queueDownload("./img/rocketship.png");
+ASSET_MANAGER.queueDownload("./img/slow.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
-    console.log("starting up da sheild");
     var canvas = document.getElementById('gameWorld');
     document.getElementById('gameWorld').focus();
     var ctx = canvas.getContext('2d');
 
     var gameEngine = new GameEngine();
 
-    var platforms = [];
-    gameEngine.platforms = platforms;
-
-    var spikes = [];
-    gameEngine.spikes = spikes;
- 
-    var blocks = [];
-    gameEngine.blocks = blocks;
-
-    var newPlatforms = [];
-    gameEngine.newPlatforms = newPlatforms;
-
-    var walls = [];
-    gameEngine.walls = walls;
-
-    var speedPowerups = [];
-    gameEngine.speedPowerups = speedPowerups;
-
-    var sloMoPowerups = [];
-    gameEngine.sloMoPowerups = sloMoPowerups;
-
-    var godModePowerups = [];
-    gameEngine.godModePowerups = godModePowerups;
-
-
-    gameEngine.addEntity(new RocketShip(gameEngine, 8500, -100));
-
     gameEngine.init(ctx);
     gameEngine.start();
     let timer = new VisibleTimer(gameEngine);
     let pg = new PlayGame(gameEngine, 320, 350);
-    gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));
-    //gameEngine.addEntity(new Foreground(gameEngine, ASSET_MANAGER.getAsset("./img/transparent_bg.png")));
+    gameEngine.addEntity(new Background(gameEngine, ASSET_MANAGER.getAsset("./img/bg.png")));  
     
+    
+    // Level 1
+    var checkpoints1 = [];
+    gameEngine.checkpoints1 = checkpoints1;
 
+    var finishLines1 = [];
+    gameEngine.finishLines1 = finishLines1;
 
-    let speedPowerup = new SpeedPowerup(gameEngine, 7500, 190);
-    gameEngine.addEntity(speedPowerup);
-    speedPowerups.push(speedPowerup);
+    var platforms1 = [];
+    gameEngine.platforms1 = platforms1;
 
-    let sloMoPowerup = new SloMoPowerup(gameEngine, 750, 190);
-    gameEngine.addEntity(sloMoPowerup);
-    sloMoPowerups.push(sloMoPowerup);
+    var spikes1 = [];
+    gameEngine.spikes1 = spikes1;
+ 
+    var blocks1 = [];
+    gameEngine.blocks1 = blocks1;
 
-    let godModePowerup = new GodModePowerup(gameEngine, 7500, 190);
-    gameEngine.addEntity(godModePowerup);
-    godModePowerups.push(godModePowerup);
+    var newPlatforms1 = [];
+    gameEngine.newPlatforms1 = newPlatforms1;
 
-    createMap(platforms, spikes, blocks, newPlatforms, walls, gameEngine);
+    var walls1 = [];
+    gameEngine.walls1 = walls1;
 
+    var speedPowerups1 = [];
+    gameEngine.speedPowerups1 = speedPowerups1;
 
-    gameEngine.addEntity(new Character(gameEngine)); 
-    // gameEngine.addEntity(new Laser(gameEngine)); 
-    /*createMap(platforms, spikes, gameEngine);
+    var sloMoPowerups1 = [];
+    gameEngine.sloMoPowerups1 = sloMoPowerups1;
 
+    var godModePowerups1 = [];
+    gameEngine.godModePowerups1 = godModePowerups1;
 
-    gameEngine.addEntity(new Character(gameEngine)); 
-    gameEngine.addEntity(new Spike(gameEngine)); */
+    //createMap1(platforms1, spikes1, blocks1, newPlatforms1, walls1, checkpoints1, finishLines1, gameEngine);
 
+    // Level 2
+    var checkpoints2 = [];
+    gameEngine.checkpoints2 = checkpoints2;
+
+    var finishLines2 = [];
+    gameEngine.finishLines2 = finishLines2;
+
+    var platforms2 = [];
+    gameEngine.platforms2 = platforms2;
+
+    var spikes2 = [];
+    gameEngine.spikes2 = spikes2;
+ 
+    var blocks2 = [];
+    gameEngine.blocks2 = blocks2;
+
+    var newPlatforms2 = [];
+    gameEngine.newPlatforms2 = newPlatforms2;
+
+    var walls2 = [];
+    gameEngine.walls2 = walls2;
+
+    var speedPowerups2 = [];
+    gameEngine.speedPowerups2 = speedPowerups2;
+
+    var sloMoPowerups2 = [];
+    gameEngine.sloMoPowerups2 = sloMoPowerups2;
+
+    var godModePowerups2 = [];
+    gameEngine.godModePowerups2 = godModePowerups2;
+
+    createMap2(platforms2, spikes2, blocks2, newPlatforms2, walls2, checkpoints2, finishLines2, speedPowerups2, sloMoPowerups2, godModePowerups2, gameEngine);
+    createMap1(platforms1, spikes1, blocks1, newPlatforms1, walls1, checkpoints1, finishLines1, speedPowerups1, sloMoPowerups1, godModePowerups1, gameEngine);
+
+    gameEngine.blocks = blocks1;
+    gameEngine.spikes = spikes1;
+    gameEngine.walls = walls1;
+    gameEngine.newPlatforms = newPlatforms1;
+    gameEngine.platforms = platforms1;
+    gameEngine.speedPowerups = speedPowerups1;
+    gameEngine.sloMoPowerups = sloMoPowerups1;
+    gameEngine.godModePowerups = godModePowerups1;
+    gameEngine.finishLines = finishLines1;
+    gameEngine.checkpoints = checkpoints1;
+
+    var char = new Character(gameEngine)
+
+    gameEngine.addEntity(char);
+    gameEngine.character = char;
     gameEngine.addEntity(new Credits(gameEngine));
- //   gameEngine.addEntity(new HandleClicks(gameEngine));
- //   gameEngine.addEntity(new HighlightSelection(gameEngine));
- //   gameEngine.mainmenu = true;
     gameEngine.addEntity(timer);
     gameEngine.addEntity(pg);
 });
