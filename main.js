@@ -615,7 +615,7 @@ Character.prototype.update = function () {
                 let blk = this.game.blocks[i];
                 if (this.boundingbox.collide(blk.boundingbox) 
                 && this.lastBottom <= blk.boundingbox.top) {
-                    console.log("landed on another platform");
+                    console.log("landed on block platform");
                     this.falling = false;
                     this.y = blk.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = blk;
@@ -625,7 +625,7 @@ Character.prototype.update = function () {
                 let npf = this.game.newPlatforms[i];
                 if (this.boundingbox.collide(npf.boundingbox) 
                 && this.lastBottom <= npf.boundingbox.top) {
-                    console.log("landed on another platform");
+                    console.log("landed on new platform");
                     this.falling = false;
                     this.y = npf.boundingbox.top - this.animation.frameHeight - 65;
                     this.platform = npf;
@@ -1279,14 +1279,14 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
     //Tunnel
     npf = new NewPlatform(gameEngine, 1300, 200);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
     npf = new NewPlatform(gameEngine, 1630, 200);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
+    newPlatforms.push(npf);
     npf = new NewPlatform(gameEngine, 1960, 200);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     /*
     *Spike under stairs
@@ -1331,16 +1331,16 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
     //TUNNEL
     npf = new NewPlatform(gameEngine, 4150, 190);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
 
     npf = new NewPlatform(gameEngine, 4600, 190);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     npf = new NewPlatform(gameEngine, 5100, 90);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
     for(let i = 0; i < 5; i++){
 
@@ -1352,10 +1352,10 @@ function createMap(platforms, spikes, blocks, newPlatforms, walls, checkpoints, 
 
     npf = new NewPlatform(gameEngine, 4900, 250);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
     npf = new NewPlatform(gameEngine, 5225, 250);
     gameEngine.addEntity(npf);
-    platforms.push(npf);
+    newPlatforms.push(npf);
 
 
     for(let i = 0; i < 5; i++){
