@@ -1620,7 +1620,7 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
     newPlatforms.push(npf);
 
 
-    blk = new Block(gameEngine, 5812, 250, 2);
+    blk = new Block(gameEngine, 5805, 250, 2);
     gameEngine.addEntity(blk);
     blocks.push(blk);
 
