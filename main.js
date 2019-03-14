@@ -1133,7 +1133,7 @@ SpeedPowerup.prototype.update = function () {
 }
 
 SpeedPowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map) && !this.game.speedUp) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
@@ -1170,14 +1170,14 @@ SloMoPowerup.prototype.update = function () {
 }
 
 SloMoPowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map) && !this.game.sloMo) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
 }
 
 function GodModePowerup(game, x, y, map) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/powerup_boost.png"), 0, 0, 64, 64, 0.2, 8, true, false);
+    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/god.png"), 0, 0, 64, 64, 0.2, 8, true, false);
     this.startX = x;
     this.startY = y;
     this.map = map;
@@ -1207,7 +1207,7 @@ GodModePowerup.prototype.update = function () {
 }
 
 GodModePowerup.prototype.draw = function (ctx) {
-    if (this.game.running && !this.game.naked && (this.map == this.game.map)) {
+    if (this.game.running && !this.game.naked && (this.map == this.game.map) && !this.game.godMode) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
     }
     Entity.prototype.draw.call(this);
@@ -1639,8 +1639,6 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
         gameEngine.addEntity(blk);
         blocks.push(blk);
 
-        console.log(blk);
-
     } 
 
     for(let i = 0; i < 5; i++){
@@ -1714,6 +1712,7 @@ ASSET_MANAGER.queueDownload("./img/powerup_boost.png");
 ASSET_MANAGER.queueDownload("./img/finish_line.png");
 ASSET_MANAGER.queueDownload("./img/rocketship.png");
 ASSET_MANAGER.queueDownload("./img/slow.png");
+ASSET_MANAGER.queueDownload("./img/god.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
