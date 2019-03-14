@@ -248,7 +248,7 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
             } else if(func == "map 2") {
                 SelectMap(game, 2);
             } else if(func == "map 3") {
-                SelectMap(game, 3);
+                //SelectMap(game, 3);
             } 
         }
 }
