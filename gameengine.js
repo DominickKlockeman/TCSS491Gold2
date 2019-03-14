@@ -47,7 +47,8 @@ VisibleTimer.prototype.draw = function(ctx) {
         this.runTime = this.game.actualTime.gameTime.toFixed(3);
     } else if(this.game.inmenus) {
         
-    } else if(!this.game.running) {
+    } 
+    else if(!this.game.running) {
         if (this.runTime != null) {
             ctx.font = "24pt Impact";
             ctx.fillStyle = "red";
@@ -178,32 +179,32 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
 
-    if(this.powerUpTimer > 0){
-        this.powerUpTimer -= 1;
-    }
+    // if(this.powerUpTimer > 0){
+    //     this.powerUpTimer -= 1;
+    // }
 
-    if(this.speedUp && this.powerUpTimer > 0) {
-        this.gameSpeed = 250;
-        console.log(this.powerUpTimer);
+    // if(this.speedUp && this.powerUpTimer > 0) {
+    //     this.gameSpeed = 250;
+    //     console.log(this.powerUpTimer);
 
-    } else if(this.sloMo && this.powerUpTimer > 0){
+    // } else if(this.sloMo && this.powerUpTimer > 0){
         
 
-    } else if(this.godMode && this.powerUpTimer > 0) {
+    // } else if(this.godMode && this.powerUpTimer > 0) {
 
     
-    }else {
-        this.gameSpeed = 200;
-        this.powerUpTimer = 300;
-        this.speedUp = false;
-        this.sloMo = false;
-        this.godMode = false;
+    // }else {
+    //     this.gameSpeed = 200;
+    //     this.powerUpTimer = 300;
+    //     this.speedUp = false;
+    //     this.sloMo = false;
+    //     this.godMode = false;
 
-    }
+    // }
 
-    if(this.running) {
-        this.canbepaused = true;
-    }
+    // if(this.running) {
+    //     this.canbepaused = true;
+    // }
 
     for (var i = 0; i < entitiesCount; i++) {
         var entity = this.entities[i];
@@ -231,9 +232,9 @@ GameEngine.prototype.update = function () {
     this.powerupClockSpeed += 1;
 }
 
-GameEngine.prototype.reset = function () {
+GameEngine.prototype.reset = function (cpX) {
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].reset();
+        this.entities[i].reset(cpX);
 
     }
     this.gameSpeed = 200;
