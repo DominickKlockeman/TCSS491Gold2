@@ -570,7 +570,7 @@ Character.prototype.update = function () {
             this.jumping = true;
             this.ground = this.y;            
         }
-        if (this.game.space) {
+        if (this.game.space && !this.jumping) {
             for (let i = 0; i < this.game.walls.length; i++) {
                 let wl = this.game.walls[i];
                 if (this.laser.boundingbox.collide(wl.boundingbox)) {
