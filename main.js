@@ -1408,7 +1408,7 @@ function createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
     newPlatform = new NewPlatform(gameEngine, 3200, 190, 1);
     gameEngine.addEntity(newPlatform);
     newPlatforms.push(newPlatform);
-    newPlatform = new NewPlatform(gameEngine, 3650, 190), 1;
+    newPlatform = new NewPlatform(gameEngine, 3650, 190, 1);
     gameEngine.addEntity(newPlatform);
     newPlatforms.push(newPlatform);
 
@@ -1632,12 +1632,14 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
         spike = new Spike(gameEngine, 5875  + 195 * i, -100, 2);
         gameEngine.addEntity(spike);
         spikes.push(spike);   
-        blk = new Block(gameEngine, 5940 + 195 * i, 250), 2;
+        blk = new Block(gameEngine, 5940 + 195 * i, 250, 2);
         gameEngine.addEntity(blk);
         blocks.push(blk);
-        blk = new Block(gameEngine, 6008 + 195 * i, 250, 2);
+        blk = new Block(gameEngine, 6000 + 195 * i, 250, 2);
         gameEngine.addEntity(blk);
         blocks.push(blk);
+
+        console.log(blk);
 
     } 
 
