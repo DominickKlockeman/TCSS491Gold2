@@ -635,31 +635,19 @@ PlayGame.prototype.draw = function (ctx) {
 
 function Character(game) {
     cubeSlideBeginning = new Animation(ASSET_MANAGER.getAsset("./img/cube_slide.png"), 0, 0, 64, 64, 0.10, 15, true, false);
-    cubeSlideBeginningUD = new Animation(ASSET_MANAGER.getAsset("./img/cube_slideUD.png"), 0, 0, 64, 64, 0.10, 14, true, false);
-
-
     cubeLaser = new Animation(ASSET_MANAGER.getAsset("./img/cube_right_laser.png"), 0, 0, 64, 64, 0.08, 8, true, false);
     this.laser = new Laser(game, this);
     game.addEntity(this.laser);
-
     this.animation = cubeSlideBeginning;
-    this.animation2 = cubeSlideBeginningUD;
-
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
-    this.jumpAnimationUD = new Animation(ASSET_MANAGER.getAsset("./img/cube_jumpUD.png"), 0, 0, 64, 64, 0.08, 8, false, false);
-
-    this.fallUpsideDownAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_fall.png"), 0, 0, 64, 64, 0.06, 5, false, false);
     this.jumping = false;
     this.falling = false;
-    this.upsideDown = false;
-    this.upsideDownCheckPoint = 0;
     this.dead = false;
     this.height = 0;
     this.cpY = 270;
     this.cpX = 0;
     game.alive = !this.dead;
     this.ground = 350;
-    this.upsideDownGround = -60;
     this.platform = game.platforms[0];
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
@@ -689,90 +677,57 @@ Character.prototype.update = function () {
             } 
         }
         if (this.jumping) {
-
-            console.log("pressed");
-
-            console.log(this.upsideDown);
-
-            if(this.upsideDown){
-
-
-                if (this.jumpAnimationUD.isDone()) {
-                    this.jumpAnimationUD.elapsedTime = 0;
-                    this.jumping = false;
-                    Character.animation2 = cubeSlideBeginningUD;
-
-                }
-                var jumpDistance = this.jumpAnimationUD.elapsedTime / this.jumpAnimationUD.totalTime;       
-                var totalHeight = -100;
-                if (jumpDistance > 0.5) {
-                    jumpDistance = 1 - jumpDistance;
-                }  
-                height = totalHeight * (-2 * (jumpDistance * jumpDistance + jumpDistance));  
-                this.lastTop = this.boundingbox.top;      
-                this.y = this.upsideDownGround + height;
-
-                this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-
+            if (this.jumpAnimation.isDone()) {
+                this.jumpAnimation.elapsedTime = 0;
+                this.jumping = false;
+                Character.animation = cubeSlideBeginning;
 
             }
-            
-            if(!this.upsideDown){
+            var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
+            var totalHeight = 400;
+            if (jumpDistance > 0.5) {
+                jumpDistance = 1 - jumpDistance;
+            }  
+            height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));  
+            this.lastBottom = this.boundingbox.bottom;      
+            this.y = this.ground - height;
 
-                console.log("JUMMMMP");
+            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 
-                if (this.jumpAnimation.isDone()) {
-                    this.jumpAnimation.elapsedTime = 0;
+
+            for (let i = 0; i < this.game.platforms.length; i++){
+                let currentPlatform = this.game.platforms[i];
+                if (this.boundingbox.collide(currentPlatform.boundingbox) 
+                && this.lastBottom <= currentPlatform.boundingbox.top
+                && currentPlatform instanceof Platform) {
                     this.jumping = false;
-                    Character.animation = cubeSlideBeginning;
-
-                }
-                var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
-                var totalHeight = 400;
-                if (jumpDistance > 0.5) {
-                    jumpDistance = 1 - jumpDistance;
+                    this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentPlatform;
+                    this.jumpAnimation.elapsedTime = 0;
                 }  
-                height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));  
-                this.lastBottom = this.boundingbox.bottom;      
-                this.y = this.ground - height;
-
-                this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-
-
-                for (let i = 0; i < this.game.platforms.length; i++){
-                    let currentPlatform = this.game.platforms[i];
-                    if (this.boundingbox.collide(currentPlatform.boundingbox) 
-                    && this.lastBottom <= currentPlatform.boundingbox.top
-                    && currentPlatform instanceof Platform) {
-                        this.jumping = false;
-                        this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                        this.platform = currentPlatform;
-                        this.jumpAnimation.elapsedTime = 0;
-                    }  
-                }       
-                for (let i = 0; i < this.game.blocks.length; i++){
-                    let currentBlock = this.game.blocks[i];
-                    if (this.boundingbox.collide(currentBlock.boundingbox) 
-                    && this.lastBottom <= currentBlock.boundingbox.top
-                    && currentBlock instanceof Block) {
-                        this.jumping = false;
-                        this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
-                        this.platform = currentBlock;
-                        this.jumpAnimation.elapsedTime = 0;
-                    }  
-                }     
-                for (let i = 0; i < this.game.newPlatforms.length; i++){
-                    let currentNewPlatform = this.game.newPlatforms[i];
-                    if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
-                    && this.lastBottom <= currentNewPlatform.boundingbox.top
-                    && currentNewPlatform instanceof NewPlatform) {
-                        this.jumping = false;
-                        this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                        this.platform = currentNewPlatform;
-                        this.jumpAnimation.elapsedTime = 0;
-                    }  
-                }    
-        }           
+            }       
+            for (let i = 0; i < this.game.blocks.length; i++){
+                let currentBlock = this.game.blocks[i];
+                if (this.boundingbox.collide(currentBlock.boundingbox) 
+                && this.lastBottom <= currentBlock.boundingbox.top
+                && currentBlock instanceof Block) {
+                    this.jumping = false;
+                    this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentBlock;
+                    this.jumpAnimation.elapsedTime = 0;
+                }  
+            }     
+            for (let i = 0; i < this.game.newPlatforms.length; i++){
+                let currentNewPlatform = this.game.newPlatforms[i];
+                if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
+                && this.lastBottom <= currentNewPlatform.boundingbox.top
+                && currentNewPlatform instanceof NewPlatform) {
+                    this.jumping = false;
+                    this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                    this.platform = currentNewPlatform;
+                    this.jumpAnimation.elapsedTime = 0;
+                }  
+            }               
         }
         if (this.falling) {
             this.lastBottom = this.boundingbox.bottom;
@@ -852,14 +807,6 @@ Character.prototype.update = function () {
                     this.dead = true;
                 }
             }
-
-            for (let i = 0; i < this.game.bosss.length; i++) {
-                let wl = this.game.bosss[i];
-                if (this.boundingbox.collide(wl.boundingbox)) {
-                    this.dead = true;
-                
-                }
-            }
         }      
         
         for (let i = 0; i < this.game.speedPowerups.length; i++) {
@@ -912,31 +859,10 @@ Character.prototype.update = function () {
             }
         }
 
-        this.upsideDownCheckPoint += 1;
-
-        if(this.upsideDownCheckPoint >= 190){
-
-            
-
-            if(this.y >= -50){
-
-                this.y -= 15;
-
-            }else{
-
-                this.upsideDown = true;
-
-
-            }
-            
-        }
-
-    }
-
         
 
 
-    
+    }
     Entity.prototype.update.call(this);
 }
 
@@ -944,49 +870,20 @@ Character.prototype.draw = function (ctx) {
     if (this.game.running) {
         if (this.dead) {
             return;
-
         } else {
-
-            if (this.upsideDown){
-
-             //   console.log("I should jump here when UD is true");
-
-                if (this.jumping) {
-                     this.jumpAnimationUD.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+            if (this.jumping) {
+                this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+            } else {
+                if (this.game.space) {
+                    this.animation = cubeLaser;
+                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                    this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
+                    
                 } else {
-                    if (this.game.space) {
-                        // this.animation = cubeLaser;
-                        // this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                        // this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
-                        
-                    } else {
-                        this.animation2 = cubeSlideBeginningUD;
-                        this.animation2.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                    }
-
+                    this.animation = cubeSlideBeginning;
+                    this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
                 }
-
-
-            }else{
-
-             //   console.log("I should jump here when UD is false");
-
-                if (this.jumping) {
-                    this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                } else {
-                    if (this.game.space) {
-                        this.animation = cubeLaser;
-                        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                        this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
-                        
-                    } else {
-                        this.animation = cubeSlideBeginning;
-                        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                    }
-
             }
-        }
-
         }
 
         Entity.prototype.draw.call(this);
@@ -997,8 +894,6 @@ Character.prototype.reset = function() {
     this.ground = 350;
     this.jumping = false;
     this.falling = true;
-    this.upsideDown = false;
-    this.upsideDownCheckPoint = 0;
     this.animation = cubeSlideBeginning;
     this.jumpAnimation.elapsedTime = 0;
     this.x = 32;
@@ -1457,42 +1352,6 @@ FinishLine.prototype.draw = function (ctx) {
     Entity.prototype.draw.call(this);
 }
 
-function Boss(game, x, y) {
-    this.animation = new Animation(ASSET_MANAGER.getAsset("./img/bossUD.png"), 0, 0, 60, 89, .20, 2, true, false);
-    this.startX = x;
-    this.startY = y;
-    this.boundingbox = new BoundingBox(this.x + 60, this.y + 89, 60, 89);
-    Entity.call(this, game, x, y);
-}
-
-Boss.prototype = new Entity();
-Boss.prototype.constructor = Boss;
-
-
-Boss.prototype.reset = function() {
-    this.x = this.startX;
-    this.y = this.startY;
-}
-
-Boss.prototype.update = function () {
-    if (!this.game.running) {
-        return;    
-    }
-    this.boundingbox = new BoundingBox(this.x + 60, this.y + 89, 60, 89);
-    this.x += 200 * this.game.clockTick;
-    Entity.prototype.update.call(this);
-}
-
-Boss.prototype.draw = function (ctx) {
-    if (this.game.running) {
-        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        // ctx.lineWidth = 3;
-        // ctx.strokeStyle = "blue";
-        // ctx.strokeRect(this.x + 60, this.y + 89, 60,89);
-    }
-    Entity.prototype.draw.call(this);
-}
-
 /******************************************************************************************/
 /******************************************************************************************/
 /******************************************************************************************/
@@ -1619,8 +1478,6 @@ function createMap1(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
     gameEngine.addEntity(finishLine);
     finishLines.push(finishLine);
 }
-
-
 
 
 /******************************************************************************************/
@@ -1834,33 +1691,15 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
 }
 
 
-function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, bosss, gameEngine) {
+function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
 
 
 
-    boss = new Boss(gameEngine, 0,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
+    //newplatform
 
-    boss = new Boss(gameEngine, -100,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
-
-    boss = new Boss(gameEngine, -200,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
-
-    boss = new Boss(gameEngine, -300,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
-
-    boss = new Boss(gameEngine, -400,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
-
-    boss = new Boss(gameEngine, -500,-40);
-    gameEngine.addEntity(boss);
-    bosss.push(boss);
+    npf = new NewPlatform(gameEngine, 1800, 0, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
 
     //GROUND
     currentPlatform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
@@ -1875,11 +1714,8 @@ function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
 var ASSET_MANAGER = new AssetManager();
 
 ASSET_MANAGER.queueDownload("./img/cube_slide.png");
-ASSET_MANAGER.queueDownload("./img/cube_slideUD.png");
 ASSET_MANAGER.queueDownload("./img/cube_jump.png");
-ASSET_MANAGER.queueDownload("./img/cube_jumpUD.png");
 ASSET_MANAGER.queueDownload("./img/cube_right_laser.png");
-ASSET_MANAGER.queueDownload("./img/cube_fall.png");
 ASSET_MANAGER.queueDownload("./img/laser.png");
 ASSET_MANAGER.queueDownload("./img/bg.png");
 ASSET_MANAGER.queueDownload("./img/transparent_bg.png");
@@ -1896,7 +1732,6 @@ ASSET_MANAGER.queueDownload("./img/finish_line.png");
 ASSET_MANAGER.queueDownload("./img/rocketship.png");
 ASSET_MANAGER.queueDownload("./img/slow.png");
 ASSET_MANAGER.queueDownload("./img/god.png");
-ASSET_MANAGER.queueDownload("./img/bossUD.png");
 
 
 ASSET_MANAGER.downloadAll(function () {
@@ -2008,10 +1843,8 @@ ASSET_MANAGER.downloadAll(function () {
     var godModePowerups3 = [];
     gameEngine.godModePowerups3 = godModePowerups3;
 
-    var boss3 = [];
-    gameEngine.boss3 = boss3;
 
-    createMap3(platforms3, spikes3, blocks3, newPlatforms3, walls3, checkpoints3, finishLines3, speedPowerups3, sloMoPowerups3, godModePowerups3, boss3, gameEngine);
+    createMap3(platforms3, spikes3, blocks3, newPlatforms3, walls3, checkpoints3, finishLines3, speedPowerups3, sloMoPowerups3, godModePowerups3, gameEngine);
     createMap2(platforms2, spikes2, blocks2, newPlatforms2, walls2, checkpoints2, finishLines2, speedPowerups2, sloMoPowerups2, godModePowerups2, gameEngine);
     createMap1(platforms1, spikes1, blocks1, newPlatforms1, walls1, checkpoints1, finishLines1, speedPowerups1, sloMoPowerups1, godModePowerups1, gameEngine);
 
@@ -2025,7 +1858,6 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.godModePowerups = godModePowerups1;
     gameEngine.finishLines = finishLines1;
     gameEngine.checkpoints = checkpoints1;
-    gameEngine.bosss = boss3;
 
     var char = new Character(gameEngine)
 
