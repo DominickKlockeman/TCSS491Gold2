@@ -250,7 +250,9 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
             } else if(func == "map 2") {
                 SelectMap(game, 2);
             } else if(func == "map 3") {
+                
                 SelectMap(game, 3);
+                
             } 
         }
 }
@@ -311,6 +313,7 @@ SelectMap = function(game, map) {
         game.blocks = game.blocks3;
         game.spikes = game.spikes3;
         game.walls = game.walls3;
+        
         game.newPlatforms = game.newPlatforms3;
         game.platforms = game.platforms3;
         if(game.naked) {
@@ -641,7 +644,7 @@ function Character(game) {
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
     this.jumping = false;
-    this.falling = false;
+    this.falling = true;
     this.dead = false;
     this.height = 0;
     this.cpY = 270;
@@ -650,7 +653,13 @@ function Character(game) {
     this.ground = 350;
     this.platform = game.platforms[0];
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    Entity.call(this, game, 32,270);
+
+
+    Entity.call(this, game, 32, 0);
+
+
+
+
 }
 
 Character.prototype = new Entity();
@@ -900,7 +909,7 @@ Character.prototype.reset = function() {
     if (this.cpX) {
         this.y = this.cpY + 50;
     } else {
-        this.y = 270;
+        this.y = 0;
     }
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
@@ -1274,6 +1283,7 @@ Wall.prototype.draw = function (ctx) {
     }
     Entity.prototype.draw.call(this);
 }
+
 
 /******************************************************************************************/
 /******************************************************************************************/
@@ -1693,13 +1703,156 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
 
 function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
 
-
-
     //newplatform
 
-    npf = new NewPlatform(gameEngine, 1800, 0, 3);
+    npf = new NewPlatform(gameEngine, -200, 100, 3);
     gameEngine.addEntity(npf);
     newPlatforms.push(npf);
+
+    //forevers spikes
+
+    for(let i = 0; i < 500; i++){
+
+        spike = new Spike(gameEngine, 0  + 65 * i, 275, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    
+    } 
+
+    //blocks
+
+
+    for(let i = 0; i < 5; i ++){
+
+    blk = new Block(gameEngine, 550 + 245 * i, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    }
+
+    //walls
+
+    for(let i = 0; i < 5; i ++){
+
+    w = new Wall(gameEngine, 675 + 245 * i, 0 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+
+    }
+
+
+    npf = new NewPlatform(gameEngine, 1525, 100, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+
+    blk = new Block(gameEngine, 2200, 34, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+
+    w = new Wall(gameEngine, 2264, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2328, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2392, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2456, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2520, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2584, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+    npf = new NewPlatform(gameEngine, 2100, -25, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+    npf = new NewPlatform(gameEngine, 2100, -90, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+    npf = new NewPlatform(gameEngine, 2100, -155, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+
+    npf = new NewPlatform(gameEngine, 2000, 225, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 2300, 225, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+    blk = new Block(gameEngine, 3000, 220, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    w = new Wall(gameEngine, 3100, 150 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+    blk = new Block(gameEngine, 3200, 170, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    w = new Wall(gameEngine, 3300, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+    blk = new Block(gameEngine, 3400, 120, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    blk = new Block(gameEngine, 3600, 70, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+
+    npf = new NewPlatform(gameEngine, 3500, 70, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+
+    w = new Wall(gameEngine, 3500, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3564, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3628, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+
+
+    w = new Wall(gameEngine, 3750, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3814, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3878, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+
+    npf = new NewPlatform(gameEngine, 3700, 70, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+
+    cp = new Checkpoint(gameEngine, 4200, -50, 3);
+    gameEngine.addEntity(cp);
+    checkpoints.push(cp);
+
 
     //GROUND
     currentPlatform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
@@ -1858,6 +2011,7 @@ ASSET_MANAGER.downloadAll(function () {
     gameEngine.godModePowerups = godModePowerups1;
     gameEngine.finishLines = finishLines1;
     gameEngine.checkpoints = checkpoints1;
+
 
     var char = new Character(gameEngine)
 
