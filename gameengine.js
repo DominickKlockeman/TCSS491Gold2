@@ -42,7 +42,12 @@ VisibleTimer.prototype.constructor = VisibleTimer;
 VisibleTimer.prototype.draw = function(ctx) {
     if (this.game.running) {
         ctx.font = "24pt Impact";
-        ctx.fillStyle = "yellow";
+        if (this.game.sloMo) {
+            ctx.fillStyle = "green";
+        } else {
+            ctx.fillStyle = "yellow";
+        }
+        
         ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
         this.runTime = this.game.actualTime.gameTime.toFixed(3);
     } else if(this.game.inmenus) {
@@ -53,9 +58,7 @@ VisibleTimer.prototype.draw = function(ctx) {
             ctx.fillStyle = "red";
             ctx.fillText(this.runTime, 695, 100);
         }
-    } else if(this.game.SloMo) {
-
-    }
+    } 
     
 }
 
