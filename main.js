@@ -646,6 +646,8 @@ function Character(game) {
     this.animation2 = cubeSlideBeginningUD;
 
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
+    this.jumpAnimationUD = new Animation(ASSET_MANAGER.getAsset("./img/cube_jumpUD.png"), 0, 0, 64, 64, 0.08, 8, false, false);
+
     this.fallUpsideDownAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_fall.png"), 0, 0, 64, 64, 0.06, 5, false, false);
     this.jumping = false;
     this.falling = false;
@@ -657,6 +659,7 @@ function Character(game) {
     this.cpX = 0;
     game.alive = !this.dead;
     this.ground = 350;
+    this.upsideDownGround = -60;
     this.platform = game.platforms[0];
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
     Entity.call(this, game, 32,270);
@@ -686,57 +689,90 @@ Character.prototype.update = function () {
             } 
         }
         if (this.jumping) {
-            if (this.jumpAnimation.isDone()) {
-                this.jumpAnimation.elapsedTime = 0;
-                this.jumping = false;
-                Character.animation = cubeSlideBeginning;
+
+            console.log("pressed");
+
+            console.log(this.upsideDown);
+
+            if(this.upsideDown){
+
+
+                if (this.jumpAnimationUD.isDone()) {
+                    this.jumpAnimationUD.elapsedTime = 0;
+                    this.jumping = false;
+                    Character.animation2 = cubeSlideBeginningUD;
+
+                }
+                var jumpDistance = this.jumpAnimationUD.elapsedTime / this.jumpAnimationUD.totalTime;       
+                var totalHeight = -100;
+                if (jumpDistance > 0.5) {
+                    jumpDistance = 1 - jumpDistance;
+                }  
+                height = totalHeight * (-2 * (jumpDistance * jumpDistance + jumpDistance));  
+                this.lastTop = this.boundingbox.top;      
+                this.y = this.upsideDownGround + height;
+
+                this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+
 
             }
-            var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
-            var totalHeight = 400;
-            if (jumpDistance > 0.5) {
-                jumpDistance = 1 - jumpDistance;
-            }  
-            height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));  
-            this.lastBottom = this.boundingbox.bottom;      
-            this.y = this.ground - height;
+            
+            if(!this.upsideDown){
 
-            this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
+                console.log("JUMMMMP");
+
+                if (this.jumpAnimation.isDone()) {
+                    this.jumpAnimation.elapsedTime = 0;
+                    this.jumping = false;
+                    Character.animation = cubeSlideBeginning;
+
+                }
+                var jumpDistance = this.jumpAnimation.elapsedTime / this.jumpAnimation.totalTime;       
+                var totalHeight = 400;
+                if (jumpDistance > 0.5) {
+                    jumpDistance = 1 - jumpDistance;
+                }  
+                height = totalHeight * (-2 * (jumpDistance * jumpDistance - jumpDistance));  
+                this.lastBottom = this.boundingbox.bottom;      
+                this.y = this.ground - height;
+
+                this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 
 
-            for (let i = 0; i < this.game.platforms.length; i++){
-                let currentPlatform = this.game.platforms[i];
-                if (this.boundingbox.collide(currentPlatform.boundingbox) 
-                && this.lastBottom <= currentPlatform.boundingbox.top
-                && currentPlatform instanceof Platform) {
-                    this.jumping = false;
-                    this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                    this.platform = currentPlatform;
-                    this.jumpAnimation.elapsedTime = 0;
-                }  
-            }       
-            for (let i = 0; i < this.game.blocks.length; i++){
-                let currentBlock = this.game.blocks[i];
-                if (this.boundingbox.collide(currentBlock.boundingbox) 
-                && this.lastBottom <= currentBlock.boundingbox.top
-                && currentBlock instanceof Block) {
-                    this.jumping = false;
-                    this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
-                    this.platform = currentBlock;
-                    this.jumpAnimation.elapsedTime = 0;
-                }  
-            }     
-            for (let i = 0; i < this.game.newPlatforms.length; i++){
-                let currentNewPlatform = this.game.newPlatforms[i];
-                if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
-                && this.lastBottom <= currentNewPlatform.boundingbox.top
-                && currentNewPlatform instanceof NewPlatform) {
-                    this.jumping = false;
-                    this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
-                    this.platform = currentNewPlatform;
-                    this.jumpAnimation.elapsedTime = 0;
-                }  
-            }               
+                for (let i = 0; i < this.game.platforms.length; i++){
+                    let currentPlatform = this.game.platforms[i];
+                    if (this.boundingbox.collide(currentPlatform.boundingbox) 
+                    && this.lastBottom <= currentPlatform.boundingbox.top
+                    && currentPlatform instanceof Platform) {
+                        this.jumping = false;
+                        this.y = currentPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                        this.platform = currentPlatform;
+                        this.jumpAnimation.elapsedTime = 0;
+                    }  
+                }       
+                for (let i = 0; i < this.game.blocks.length; i++){
+                    let currentBlock = this.game.blocks[i];
+                    if (this.boundingbox.collide(currentBlock.boundingbox) 
+                    && this.lastBottom <= currentBlock.boundingbox.top
+                    && currentBlock instanceof Block) {
+                        this.jumping = false;
+                        this.y = currentBlock.boundingbox.top - this.animation.frameHeight - 65;
+                        this.platform = currentBlock;
+                        this.jumpAnimation.elapsedTime = 0;
+                    }  
+                }     
+                for (let i = 0; i < this.game.newPlatforms.length; i++){
+                    let currentNewPlatform = this.game.newPlatforms[i];
+                    if (this.boundingbox.collide(currentNewPlatform.boundingbox) 
+                    && this.lastBottom <= currentNewPlatform.boundingbox.top
+                    && currentNewPlatform instanceof NewPlatform) {
+                        this.jumping = false;
+                        this.y = currentNewPlatform.boundingbox.top - this.animation.frameHeight - 65;
+                        this.platform = currentNewPlatform;
+                        this.jumpAnimation.elapsedTime = 0;
+                    }  
+                }    
+        }           
         }
         if (this.falling) {
             this.lastBottom = this.boundingbox.bottom;
@@ -877,23 +913,30 @@ Character.prototype.update = function () {
         }
 
         this.upsideDownCheckPoint += 1;
-        console.log(this.upsideDownCheckPoint);
 
         if(this.upsideDownCheckPoint >= 190){
 
-            this.upsideDown = true;
+            
 
             if(this.y >= -50){
 
                 this.y -= 15;
+
+            }else{
+
+                this.upsideDown = true;
+
+
             }
             
         }
 
+    }
+
         
 
 
-    }
+    
     Entity.prototype.update.call(this);
 }
 
@@ -906,8 +949,10 @@ Character.prototype.draw = function (ctx) {
 
             if (this.upsideDown){
 
+             //   console.log("I should jump here when UD is true");
+
                 if (this.jumping) {
-                    // this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                     this.jumpAnimationUD.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
                 } else {
                     if (this.game.space) {
                         // this.animation = cubeLaser;
@@ -921,26 +966,27 @@ Character.prototype.draw = function (ctx) {
 
                 }
 
-            
-                }else{
 
+            }else{
 
-                    if (this.jumping) {
-                        this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+             //   console.log("I should jump here when UD is false");
+
+                if (this.jumping) {
+                    this.jumpAnimation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                } else {
+                    if (this.game.space) {
+                        this.animation = cubeLaser;
+                        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                        this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
+                        
                     } else {
-                        if (this.game.space) {
-                            this.animation = cubeLaser;
-                            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                            this.laser.animation.drawFrame(this.game.clockTick, ctx, 136, this.y - 20, 4);
-                            
-                        } else {
-                            this.animation = cubeSlideBeginning;
-                            this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-                        }
+                        this.animation = cubeSlideBeginning;
+                        this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
+                    }
 
-                }
-
+            }
         }
+
         }
 
         Entity.prototype.draw.call(this);
@@ -1440,9 +1486,9 @@ Boss.prototype.update = function () {
 Boss.prototype.draw = function (ctx) {
     if (this.game.running) {
         this.animation.drawFrame(this.game.clockTick, ctx, this.x, this.y, 3);
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = "blue";
-        ctx.strokeRect(this.x + 60, this.y + 89, 60,89);
+        // ctx.lineWidth = 3;
+        // ctx.strokeStyle = "blue";
+        // ctx.strokeRect(this.x + 60, this.y + 89, 60,89);
     }
     Entity.prototype.draw.call(this);
 }
@@ -1831,6 +1877,7 @@ var ASSET_MANAGER = new AssetManager();
 ASSET_MANAGER.queueDownload("./img/cube_slide.png");
 ASSET_MANAGER.queueDownload("./img/cube_slideUD.png");
 ASSET_MANAGER.queueDownload("./img/cube_jump.png");
+ASSET_MANAGER.queueDownload("./img/cube_jumpUD.png");
 ASSET_MANAGER.queueDownload("./img/cube_right_laser.png");
 ASSET_MANAGER.queueDownload("./img/cube_fall.png");
 ASSET_MANAGER.queueDownload("./img/laser.png");
