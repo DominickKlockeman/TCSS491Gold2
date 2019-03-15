@@ -47,13 +47,15 @@ VisibleTimer.prototype.draw = function(ctx) {
         this.runTime = this.game.actualTime.gameTime.toFixed(3);
     } else if(this.game.inmenus) {
         
-    } else {
+    } else if(!this.game.running) {
         if (this.runTime != null) {
             ctx.font = "24pt Impact";
             ctx.fillStyle = "red";
             ctx.fillText(this.runTime, 695, 100);
         }
-    } 
+    } else if(this.game.SloMo) {
+
+    }
     
 }
 
@@ -76,9 +78,20 @@ function GameEngine() {
     this.running = false;
     this.inmenus = true;
     this.ispaused = false;
+    this.levelselection = false;
     this.volume = 3;
     this.song = menuBackgroundSound;
     this.playerFinished;
+    this.firstCp = false;
+    this.character;
+    this.powerUpTimer = 300;
+    this.sloMo = false;
+    this.speedUp = false;
+    this.godMode = false;
+    this.gameSpeed = 200;
+    this.powerupClockSpeed = 0; 
+    this.map;
+
 }
 
 GameEngine.prototype.init = function (ctx) {
@@ -169,6 +182,28 @@ GameEngine.prototype.draw = function () {
 GameEngine.prototype.update = function () {
     var entitiesCount = this.entities.length;
 
+    if(this.powerUpTimer > 0){
+        this.powerUpTimer -= 1;
+    }
+
+    if(this.speedUp && this.powerUpTimer > 0) {
+        this.gameSpeed = 275;
+
+    } else if(this.sloMo && this.powerUpTimer > 0){
+        
+
+    } else if(this.godMode && this.powerUpTimer > 0) {
+
+    
+    }else {
+        this.gameSpeed = 200;
+        this.powerUpTimer = 300;
+        this.speedUp = false;
+        this.sloMo = false;
+        this.godMode = false;
+
+    }
+
     if(this.running) {
         this.canbepaused = true;
     }
@@ -179,7 +214,11 @@ GameEngine.prototype.update = function () {
         if (!entity.removeFromWorld) {
             entity.update();
             if (entity instanceof PlayGame) {
-                if (entity.game.running != null && entity.game.running) {
+                if(entity.game.running != null && entity.game.running && this.sloMo) {
+                    if(this.powerupClockSpeed % 10 == 0) {
+                        this.actualTime.tick();
+                    }
+                } else if (entity.game.running != null && entity.game.running ) {
                     this.actualTime.tick();
                 }
             }
@@ -191,15 +230,25 @@ GameEngine.prototype.update = function () {
             this.entities.splice(i, 1);
         }
     }
+
+    this.powerupClockSpeed += 1;
 }
 
-GameEngine.prototype.reset = function () {
+GameEngine.prototype.reset = function (cpX) {
+    for (var i = cpX; i < this.checkpoints.length; i++) {
+        let cp = this.checkpoints[i];
+        cp.animation = cp.unactivatedCp;
+    }
     for (var i = 0; i < this.entities.length; i++) {
-        this.entities[i].reset();
+        this.entities[i].reset(cpX);
 
     }
-    //console.log(this.actualTime.gameTime);
-    // this.actualTime.gameTime = 0;
+
+    
+    this.gameSpeed = 200;
+    this.godMode = false;
+    this.speedUp = false;
+    this.sloMo = false;
 
 }
 
@@ -212,7 +261,7 @@ GameEngine.prototype.loop = function () {
     this.w = null;
     this.click = null;
     this.wheel = null;
-    this.space = null;
+    //this.space = null;
     // this.draw();
     // this.space = null;
     // this.click = null;
