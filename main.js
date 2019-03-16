@@ -250,7 +250,7 @@ HandleClicks = function(ctx, game, startX, endX, startY, endY, func) {
             } else if(func == "map 2") {
                 SelectMap(game, 2);
             } else if(func == "map 3") {
-                //SelectMap(game, 3);
+                SelectMap(game, 3);
             } 
         }
 }
@@ -321,11 +321,10 @@ SelectMap = function(game, map) {
             game.speedPowerups = blank2; 
             game.godModePowerups = blank3;
         } else {
-            ame.speedPowerups = game.speedPowerups3;
+            game.speedPowerups = game.speedPowerups3;
             game.sloMoPowerups = game.sloMoPowerups3;
             game.godModePowerups = game.godModePowerups3;
         }
-        g
         game.finishLines = game.finishLines3;
         game.checkpoints = game.checkpoints3;
         game.character.platform = game.platforms3[0];
@@ -641,7 +640,7 @@ function Character(game) {
     this.animation = cubeSlideBeginning;
     this.jumpAnimation = new Animation(ASSET_MANAGER.getAsset("./img/cube_jump.png"), 0, 0, 64, 64, 0.08, 8, false, false);
     this.jumping = false;
-    this.falling = false;
+    this.falling = true;
     this.dead = false;
     this.height = 0;
     this.cpY = 270;
@@ -650,7 +649,7 @@ function Character(game) {
     this.ground = 350;
     this.platform = game.platforms[0];
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
-    Entity.call(this, game, 32,270);
+    Entity.call(this, game, 32, 0);
 }
 
 Character.prototype = new Entity();
@@ -900,7 +899,7 @@ Character.prototype.reset = function() {
     if (this.cpX) {
         this.y = this.cpY + 50;
     } else {
-        this.y = 270;
+        this.y = 0;
     }
     this.boundingbox = new BoundingBox(this.x + 64, this.y + 64, 64, 64);
 }
@@ -1694,6 +1693,282 @@ function createMap2(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
 
 }
 
+/******************************************************************************************/
+/******************************************************************************************/
+/******************************************************************************************/
+
+function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints, finishLines, speedPowerups, sloMoPowerups, godModePowerups, gameEngine) {
+    
+    //newplatform
+    npf = new NewPlatform(gameEngine, -200, 100, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    //forevers spikes
+    for (let i = 0; i < 500; i++) {
+        spike = new Spike(gameEngine, 0 + 65 * i, 275, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+    
+    //blocks
+    for (let i = 0; i < 5; i ++){
+        blk = new Block(gameEngine, 550 + 245 * i, 100, 3);
+        gameEngine.addEntity(blk);
+        blocks.push(blk);
+    }
+    
+    //walls
+    for (let i = 0; i < 5; i ++){
+        w = new Wall(gameEngine, 675 + 245 * i, 0 , 3);
+        gameEngine.addEntity(w);
+        walls.push(w);
+    }
+    
+    npf = new NewPlatform(gameEngine, 1525, 100, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    blk = new Block(gameEngine, 2200, 34, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+   
+    w = new Wall(gameEngine, 2264, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2328, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2392, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2456, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2520, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 2584, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    
+    npf = new NewPlatform(gameEngine, 2100, -25, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 2100, -90, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 2100, -155, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 2000, 225, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 2300, 225, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    blk = new Block(gameEngine, 3000, 220, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    
+    w = new Wall(gameEngine, 3100, 150 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+   
+    blk = new Block(gameEngine, 3200, 170, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    w = new Wall(gameEngine, 3300, 100 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    blk = new Block(gameEngine, 3400, 120, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 3600, 70, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    
+    npf = new NewPlatform(gameEngine, 3500, 70, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    w = new Wall(gameEngine, 3500, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3564, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3628, 70 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3750, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3814, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 3878, -25 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    
+    npf = new NewPlatform(gameEngine, 3700, 70, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    cp = new Checkpoint(gameEngine, 4175, -50, 3);
+    gameEngine.addEntity(cp);
+    checkpoints.push(cp);
+    
+    blk = new Block(gameEngine, 4400, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4500, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4650, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4650, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    
+    w = new Wall(gameEngine, 4715, 0 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 4780, 0 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    
+    blk = new Block(gameEngine, 4850, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5050, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5250, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5450, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5700, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5850, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6000, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6150, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6300, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6450, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6650, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6850, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7050, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7250, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7400, 25, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+   
+    spike = new Spike(gameEngine, 7380, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 7445, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 7510, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    
+    for (let i = 0; i < 24; i++){
+        spike = new Spike(gameEngine, 7700 + 65 * i, 75, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+    
+    npf = new NewPlatform(gameEngine, 7300, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 7625, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 7950, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8275, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8600, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8925, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 9250, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 9575 , 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    blk = new Block(gameEngine, 9435, 75, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    
+    for (let i = 0; i < 20; i++){
+        spike = new Spike(gameEngine, 9500 + 65 * i, 75, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+    
+    for (let i = 0; i < 20; i++){
+        spike = new Spike(gameEngine, 9500 + 65 * i, 120, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    }
+   
+    for (let i = 0; i < 10; i ++){
+        blk = new Block(gameEngine, 9625 + 225 * i, 25, 3);
+        gameEngine.addEntity(blk);
+        blocks.push(blk);
+    }
+    
+    //walls
+    for (let i = 0; i < 9; i ++){
+        w = new Wall(gameEngine, 9850 + 225 * i, -100, 3);
+        gameEngine.addEntity(w);
+        walls.push(w);
+    }
+    
+    npf = new NewPlatform(gameEngine, 11550, 100, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    
+    fl = new FinishLine(gameEngine, 11650, -100, 3);
+    gameEngine.addEntity(fl);
+    finishLines.push(fl);
+    
+    //GROUND
+    currentPlatform = new Platform(gameEngine, 0, 400, 1000000000, 100, "black");
+    gameEngine.addEntity(currentPlatform);
+    platforms.push(currentPlatform);
+}
+
 // the "main" code begins here
 
 var ASSET_MANAGER = new AssetManager();
@@ -1797,6 +2072,39 @@ ASSET_MANAGER.downloadAll(function () {
     var godModePowerups2 = [];
     gameEngine.godModePowerups2 = godModePowerups2;
 
+    // Level 3
+    var checkpoints3 = [];
+    gameEngine.checkpoints3 = checkpoints3;
+
+    var finishLines3 = [];
+    gameEngine.finishLines3 = finishLines3;
+
+    var platforms3 = [];
+    gameEngine.platforms3 = platforms3;
+
+    var spikes3 = [];
+    gameEngine.spikes3 = spikes3;
+ 
+    var blocks3 = [];
+    gameEngine.blocks3 = blocks3;
+
+    var newPlatforms3 = [];
+    gameEngine.newPlatforms3 = newPlatforms3;
+
+    var walls3 = [];
+    gameEngine.walls3 = walls3;
+
+    var speedPowerups3 = [];
+    gameEngine.speedPowerups3 = speedPowerups3;
+
+    var sloMoPowerups3 = [];
+    gameEngine.sloMoPowerups3 = sloMoPowerups3;
+
+    var godModePowerups3 = [];
+    gameEngine.godModePowerups3 = godModePowerups3;
+
+
+    createMap3(platforms3, spikes3, blocks3, newPlatforms3, walls3, checkpoints3, finishLines3, speedPowerups3, sloMoPowerups3, godModePowerups3, gameEngine);
     createMap2(platforms2, spikes2, blocks2, newPlatforms2, walls2, checkpoints2, finishLines2, speedPowerups2, sloMoPowerups2, godModePowerups2, gameEngine);
     createMap1(platforms1, spikes1, blocks1, newPlatforms1, walls1, checkpoints1, finishLines1, speedPowerups1, sloMoPowerups1, godModePowerups1, gameEngine);
 
