@@ -1849,9 +1849,180 @@ function createMap3(platforms, spikes, blocks, newPlatforms, walls, checkpoints,
     newPlatforms.push(npf);
 
 
-    cp = new Checkpoint(gameEngine, 4200, -50, 3);
+    cp = new Checkpoint(gameEngine, 4175, -50, 3);
     gameEngine.addEntity(cp);
     checkpoints.push(cp);
+
+
+    blk = new Block(gameEngine, 4400, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4500, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4650, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 4650, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    w = new Wall(gameEngine, 4715, 0 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+    w = new Wall(gameEngine, 4780, 0 , 3);
+    gameEngine.addEntity(w);
+    walls.push(w);
+
+    
+
+    blk = new Block(gameEngine, 4850, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5050, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5250, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5450, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+    blk = new Block(gameEngine, 5700, 200, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 5850, 150, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6000, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6150, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6300, 100, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6450, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6650, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 6850, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7050, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7250, 50, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+    blk = new Block(gameEngine, 7400, 25, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+
+
+
+    spike = new Spike(gameEngine, 7380, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 7445, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+    spike = new Spike(gameEngine, 7510, 75, 3);
+    gameEngine.addEntity(spike);
+    spikes.push(spike);
+
+
+    for(let i = 0; i < 24; i++){
+
+        spike = new Spike(gameEngine, 7700 + 65 * i, 75, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    
+    } 
+
+
+    npf = new NewPlatform(gameEngine, 7300, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 7625, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 7950, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8275, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8600, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 8925, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 9250, 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+    npf = new NewPlatform(gameEngine, 9575 , 215, 3);
+    gameEngine.addEntity(npf);
+    newPlatforms.push(npf);
+
+
+    blk = new Block(gameEngine, 9435, 75, 3);
+    gameEngine.addEntity(blk);
+    blocks.push(blk);
+        
+    for(let i = 0; i < 20; i++){
+
+        spike = new Spike(gameEngine, 9500 + 65 * i, 75, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    
+    } 
+
+    for(let i = 0; i < 20; i++){
+
+        spike = new Spike(gameEngine, 9500 + 65 * i, 120, 3);
+        gameEngine.addEntity(spike);
+        spikes.push(spike);
+    
+    } 
+
+
+    for(let i = 0; i < 10; i ++){
+
+        blk = new Block(gameEngine, 9625 + 225 * i, 25, 3);
+        gameEngine.addEntity(blk);
+        blocks.push(blk);
+    
+        }
+    
+        //walls
+    
+        for(let i = 0; i < 9; i ++){
+    
+        w = new Wall(gameEngine, 9850 + 225 * i, -100, 3);
+        gameEngine.addEntity(w);
+        walls.push(w);
+    
+    
+        }
+
+
+
+        npf = new NewPlatform(gameEngine, 11550, 100, 3);
+        gameEngine.addEntity(npf);
+        newPlatforms.push(npf);
+
+
+        fl = new FinishLine(gameEngine, 11650, -100, 3);
+        gameEngine.addEntity(fl);
+        finishLines.push(fl);
+    
+
 
 
     //GROUND
