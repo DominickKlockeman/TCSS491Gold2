@@ -47,11 +47,11 @@ VisibleTimer.prototype.draw = function(ctx) {
         } else {
             ctx.fillStyle = "yellow";
         }
-        
+
         ctx.fillText(this.game.actualTime.gameTime.toFixed(3), 695, 100);
         this.runTime = this.game.actualTime.gameTime.toFixed(3);
     } else if(this.game.inmenus) {
-        
+
     } else if(!this.game.running) {
         if (this.runTime != null) {
             ctx.font = "24pt Impact";
@@ -59,7 +59,7 @@ VisibleTimer.prototype.draw = function(ctx) {
             ctx.fillText(this.runTime, 695, 100);
         }
     } 
-    
+
 }
 
 function GameEngine() {
